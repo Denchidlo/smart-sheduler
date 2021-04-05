@@ -1,6 +1,6 @@
 # smart-sheduler
 
-ISUES:
+ISSUES:
 - UserLogin
 - Show student info(FIO, Schedule, UserFiles)
--USER FILE ISSUE:
+USER FILE ISSUE:
