@@ -1,7 +1,6 @@
 # smart-scheduler
  
 
-##1)Get started with Projcet structure
 
 * smart-scheduler
     * requirements >> Faster dependency installation during co-op. Just add new .sh script to make ur teammate possible to install some package (don't forget about chmod)
