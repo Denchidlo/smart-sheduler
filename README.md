@@ -8,3 +8,14 @@
     * schedule-fetcher >> Little util, created for fetching all data from ***BSUIR API*** to local databases 
     * server >> our project itself
 
+# Technologies:
+
+* Pybot
+    * python ORM -> django.db
+    * pybot backend -> django
+
+* Smart-scheduler
+    * DB ORM -> Hibernate + JPA (Spring Data)
+    * DB -> MySQL
+    * Backend -> Spring
+    * Frontend -> Mustashe | Thymeleaf
