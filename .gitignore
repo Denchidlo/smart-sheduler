@@ -24,6 +24,7 @@ hs_err_pid*
 
 # Cache files and folders
 __pycache__
+.ipynb_checkpoints
 
 # self-added folders
 sandbox
