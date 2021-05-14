@@ -3,7 +3,7 @@ __pycache__
 .ipynb_checkpoints
 
 # Ignore telegram token
-source/baseapp/appconfig.json
+*.json
 *migrations*
 
 # Self-added folders
