@@ -1,3 +1,6 @@
 from django.db import models
+from .dbmodels.auth import ScheduleUser, ScheduleUserManager
 
-# Create your models here.
+
+
+    

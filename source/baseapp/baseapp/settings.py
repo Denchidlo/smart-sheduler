@@ -25,15 +25,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-q)@jybh1fian*463=ps33lq71tkqj%m^u!bg6ptyr%qfux=hf4'
 
+AUTH_USER_MODEL = 'bot.ScheduleUser'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 with open(f'{BASE_DIR}/appconfig.json', 'r') as reader:
     json_doc = json.load(reader)
+    DEBUG = json_doc["debug"]
     TOKEN = json_doc["api-token"]
     DOMAIN = json_doc["domain"]
-    PORT = json_doc["port"]
 
 
 ALLOWED_HOSTS = [
@@ -44,9 +44,9 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'bot.apps.BotConfig',
+    'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'baseapp.urls'
 

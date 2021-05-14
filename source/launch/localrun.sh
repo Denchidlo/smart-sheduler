@@ -1,12 +1,14 @@
+#!/bin/bash
+
 cd ../../
-source ./telebot-env/bin/activate
+source telebot-env/bin/activate
 
 echo "Enviroment setup complete"
 
-cd /source/launch
-cd /launch
-ngrok http --config=ngrok.yml 8000
-curl  http://localhost:4040/api/tunnels > ngrok_tmp.jsom
+cd source/launch
+ngrok http 8080 > /dev/null & 
+sleep 3
+curl  http://localhost:4040/api/tunnels > ngrok_tmp.json
 echo "ngrok server launched"
 
 python get_domain.py
@@ -15,9 +17,9 @@ echo "appconfig.json configured"
 
 cd ../baseapp
 
-python -m django makemigrations
-python -m django migrate
+python manage.py makemigrations
+python manage.py migrate
 echo "migrations resolved"
 
-python manage.py runserver
+python manage.py runserver 0:8080
 echo "Server up"
