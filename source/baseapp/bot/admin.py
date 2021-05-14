@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import ScheduleUser
+from .models import ScheduleUser, Chat
 
 
 class UserCreationForm(forms.ModelForm):
@@ -75,8 +75,6 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-# Now register the new UserAdmin...
-admin.site.register(ScheduleUser, UserAdmin)
-# ... and, since we're not using Django's built-in permissions,
-# unregister the Group model from admin.
 admin.site.unregister(Group)
+admin.site.register(ScheduleUser, UserAdmin)
+admin.site.register(Chat)
