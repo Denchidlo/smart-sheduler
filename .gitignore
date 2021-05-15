@@ -1,11 +1,9 @@
 # Cache files and folders
 __pycache__
-.ipynb_checkpoints
 
 # Ignore telegram token
-*.json
+appconfig.json
 *migrations*
-
 # Self-added folders
 
 

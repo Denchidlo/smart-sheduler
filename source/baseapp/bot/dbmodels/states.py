@@ -3,12 +3,14 @@ from .chat import Chat
 
 class State(Enum):
     CHAT_STARTED = 1
-    NO_ACTIONS = 4
-    SIGNING_IN_UNAME = 2
-    SIGNING_IN_PASS = 2
-    SIGNING_IN_CONFIRM_PASS = 2
-    LOGING_IN_PASS = 5
-    LOGING_IN_UNAME = 3
+    NO_ACTIONS = 2
+    SIGNING_IN_UNAME = 3
+    SIGNING_IN_FNAME = 4
+    SIGNING_IN_LNAME = 5
+    SIGNING_IN_PASS = 6
+    SIGNING_IN_CONFIRM_PASS = 7
+    LOGING_IN_PASS = 8
+    LOGING_IN_UNAME = 9
 
 
 def onstate(chat_id: Chat, enum_state: State) -> bool:
