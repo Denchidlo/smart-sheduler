@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
+    BaseUserManager, AbstractBaseUser, Group
 )
 
 class ScheduleUserManager(BaseUserManager):
@@ -46,8 +46,10 @@ class ScheduleUser(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    
 
     objects = ScheduleUserManager()
 
