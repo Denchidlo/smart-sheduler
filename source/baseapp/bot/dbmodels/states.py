@@ -1,5 +1,7 @@
 from enum import Enum
+from typing import Iterable
 from .chat import Chat
+
 
 class State(Enum):
     CHAT_STARTED = 1
@@ -13,14 +15,16 @@ class State(Enum):
     LOGING_IN_UNAME = 9
 
 
-def onstate(chat_id: Chat, enum_state: State) -> bool:
+def onstate(chat_id: Chat, enum_states) -> bool:
     try:
-        return Chat.objects.get(chat_id=chat_id).state == enum_state.value
-    except Exception:
+        state = Chat.objects.get(chat_id=chat_id).state
+        return state in [el.value for el in enum_states]
+    except:
         return False
+
 
 def authorized(chat_id: Chat) -> bool:
     try:
         return Chat.objects.get(chat_id=chat_id).authorised
-    except Exception:
+    except:
         return False

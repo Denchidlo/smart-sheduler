@@ -36,6 +36,7 @@ def cmd_start_handler(message: types.Message):
         'connected_user': None,
         'state': State.CHAT_STARTED.value
     })
+    print("\n\tPASSED\n")
     if created:
         bot.send_message(chat_id, 'Hello, {user}\nNice to meet you'.format(
             user=message.from_user.first_name))

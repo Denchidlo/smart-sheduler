@@ -3,18 +3,20 @@ from .common_objects import *
 @bot.callback_query_handler(lambda call: call.data == 'c_login')
 def button_login(call: types.CallbackQuery):
     callback_message = call.message
-    print("............................................")
     try:
         chat_id = callback_message.chat.id
         chat = Chat.objects.get(chat_id=chat_id)
-        bot.send_message(chat_id, "Enter username:")
-        chat.state = State.LOGING_IN_UNAME.value
-        chat.save()
+        if not chat.authorised:
+            bot.send_message(chat_id, "Enter username:")
+            chat.state = State.LOGING_IN_UNAME.value
+            chat.save()
+        else:
+            bot.send_message(chat_id, "You need to logout first")
     except Exception as ex:
         bot.send_message(callback_message.chat.id,
                          "Something went wrong\nTry again")
 
-@bot.message_handler(content_types=['text'], func=lambda message: onstate(message.chat.id, State.LOGING_IN_UNAME))
+@bot.message_handler(content_types=['text'], func=lambda message: onstate(message.chat.id, [State.LOGING_IN_UNAME]))
 def login_username_input(message):
     message_input = message.text
     chat_id = message.chat.id
@@ -29,7 +31,7 @@ def login_username_input(message):
     chat.save()
     bot.send_message(chat_id, "Enter password:")
 
-@bot.message_handler(content_types=['text'], func=lambda message: onstate(message.chat.id, State.LOGING_IN_PASS))
+@bot.message_handler(content_types=['text'], func=lambda message: onstate(message.chat.id, [State.LOGING_IN_PASS]))
 def login_password_input(message):
     message_input = message.text
     chat_id = message.chat.id
