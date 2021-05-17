@@ -29,7 +29,7 @@ AUTH_USER_MODEL = 'bot.ScheduleUser'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-with open(f'{BASE_DIR}/appconfig.json', 'r') as reader:
+with open(f'{BASE_DIR}/appsettings.json', 'r') as reader:
     json_doc = json.load(reader)
     DEBUG = json_doc["debug"]
     TOKEN = json_doc["api-token"]

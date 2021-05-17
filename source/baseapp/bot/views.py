@@ -16,12 +16,11 @@ class BotResponcer(View):
         return HttpResponse("Bot is running")
 
     def post(self, request, *args, **kwargs):
-        global update_id
         json_str = request.body.decode('UTF-8')
         update = types.Update.de_json(json_str)
         if self.update_id != update.update_id:
             bot.process_new_updates([update])
-            update_id = update.update_id
+            self.update_id = update.update_id
 
         return HttpResponse('')
 
