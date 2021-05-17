@@ -3,11 +3,10 @@ from .dbmodels.chat import Chat
 from .dbmodels.states import State, onstate
 from .dbmodels.auth import ScheduleUser
 from .handlers import login, signin
-from .bot_init import bot
+from .services.bot_init import bot
 from django.http import HttpResponse
 from django.views import View
 from telebot import types
-from .bot_init import bot
 
 class BotResponcer(View):
     def __init__(self):

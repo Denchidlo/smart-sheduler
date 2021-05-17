@@ -8,22 +8,22 @@ class WeekDay(Enum):
     MONDAY = (1, "Понедельник")
     TUESDAY = (2, "Вторник")
     WEDNESDAY = (3, "Среда")
-    THURSDAY = (4, "Вторник")
-    FRIDAY = (5, "Вторник")
-    SATURDAY = (6, "Вторник")
-    SUNSDAY = (7, "Вторник")
+    THURSDAY = (4, "Четверг")
+    FRIDAY = (5, "Пятница")
+    SATURDAY = (6, "Суббота")
+    SUNSDAY = (7, "Воскресенье")
 
 def weekday_to_int(day_str: str) -> int:
     for day in WeekDay:
-        if day_str == day.value[1]:
+        if day_str.encode("UTF-16") == day.value[1].encode(("UTF-16")):
             return day.value[0]
-    return 0
+    raise ValueError("Uncknown day")
 
 def int_to_weekday(day_int: int) -> WeekDay:
     for day in WeekDay:
         if day_int == day.value[0]:
             return day
-    return 0
+    raise ValueError("Uncknown day")
 
 def weeks_to_int(weeks_list: list) -> int:
     result = 0

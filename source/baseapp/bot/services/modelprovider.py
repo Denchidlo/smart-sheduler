@@ -1,8 +1,8 @@
 from typing import Iterable
 from requests.models import HTTPError
-from .dbmodels.employee import Employee
-from .dbmodels.group import StudentGroup
-from .dbmodels.schedule import Lesson, weekday_to_int, weeks_to_int
+from ..dbmodels.employee import Employee
+from ..dbmodels.group import StudentGroup
+from ..dbmodels.schedule import Lesson, weekday_to_int, weeks_to_int
 from enum import Enum
 from datetime import time
 import requests as req
@@ -37,10 +37,7 @@ class ScheduleProvider:
             employee_schedule = self.make_request(
                 RequestStrings.GET_EMPLOYEE_SCHEDULE.value+str(employee['id']))
             for schedule in employee_schedule['schedules']:
-                try:
-                    weekday = weekday_to_int(schedule["weekDay"])
-                except:
-                    weekday = 0
+                weekday = weekday_to_int(schedule["weekDay"])
                 lessons = schedule['schedule']
                 for lesson in lessons:
                     group_list = lesson['studentGroup']

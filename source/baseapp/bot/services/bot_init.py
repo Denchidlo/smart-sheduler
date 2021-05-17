@@ -1,5 +1,5 @@
 from django.conf import settings
-from .dbmodels.auth import ScheduleUser
+from ..dbmodels.auth import ScheduleUser
 import time
 from telebot import TeleBot, logger
 import logging

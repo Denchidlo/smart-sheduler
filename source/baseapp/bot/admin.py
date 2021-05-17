@@ -1,7 +1,8 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .modelprovider import ScheduleProvider
+from .services.modelprovider import ScheduleProvider
 from .models import *
 
 admin.site.unregister(Group)
@@ -11,4 +12,5 @@ admin.site.register(Employee)
 admin.site.register(Lesson)
 admin.site.register(StudentGroup)
 
-# ScheduleProvider().load()
+if settings.DATA_UPLOAD:
+    ScheduleProvider().load()

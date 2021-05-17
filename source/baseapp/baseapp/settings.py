@@ -34,6 +34,7 @@ with open(f'{BASE_DIR}/appconfig.json', 'r') as reader:
     DEBUG = json_doc["debug"]
     TOKEN = json_doc["api-token"]
     DOMAIN = json_doc["domain"]
+    DATA_UPLOAD = json_doc["data-fetching"]
 
 
 ALLOWED_HOSTS = [

@@ -3,7 +3,7 @@ __pycache__
 
 # Ignore telegram token
 *migrations*
-*.json
+appconfig.json
 # Self-added folders
 
 
