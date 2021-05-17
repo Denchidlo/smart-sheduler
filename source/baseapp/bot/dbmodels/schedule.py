@@ -1,10 +1,10 @@
-from typing import Iterable
-from .group import Group
+from .group import StudentGroup
 from .employee import Employee
 from django.db import models
 from enum import Enum
 
 class WeekDay(Enum):
+    NULL_DAY = (0, "NULL_DAY")
     MONDAY = (1, "Понедельник")
     TUESDAY = (2, "Вторник")
     WEDNESDAY = (3, "Среда")
@@ -13,11 +13,17 @@ class WeekDay(Enum):
     SATURDAY = (6, "Вторник")
     SUNSDAY = (7, "Вторник")
 
-def convert_to_weekday(day_str: str):
+def weekday_to_int(day_str: str) -> int:
     for day in WeekDay:
         if day_str == day.value[1]:
             return day.value[0]
-    raise ValueError("Unknown day")
+    return 0
+
+def int_to_weekday(day_int: int) -> WeekDay:
+    for day in WeekDay:
+        if day_int == day.value[0]:
+            return day
+    return 0
 
 def weeks_to_int(weeks_list: list) -> int:
     result = 0
@@ -41,13 +47,14 @@ class Week(Enum):
 
 class Lesson(models.Model):
     weekday = models.SmallIntegerField()
-    weeks = models.SmallIntegerField()
+    weeks = models.IntegerField()
     subgroup = models.SmallIntegerField(default=0)
     auditory = models.CharField(max_length=12, null=True, blank=True, default="unknown")
     lesson_time = models.CharField(max_length=11)
     lesson_start = models.TimeField()
     lesson_end = models.TimeField()
+    lesson_type = models.CharField(max_length=6)
     subject = models.CharField(max_length=20)
-    groups = models.ManyToManyField(Group)
-    employee = models.ForeignKey(Employee)
+    groups = models.ManyToManyField(StudentGroup)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, default=None, null=True, blank=True)
     zaoch = models.BooleanField(default=False)
