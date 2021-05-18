@@ -1,10 +1,21 @@
 from .auth import ScheduleUser
-from .schedule import Lesson, int_to_weeks
 from django.db import models
+
+
+def int_to_weeks(hashed_weeks: int) -> list:
+    weeks = []
+    for i in range(4):
+        if (hashed_weeks & 7) != 0:
+            weeks.append(hashed_weeks & 7)
+            hashed_weeks = hashed_weeks >> 3
+    return weeks
+
 
 class StudentGroup(models.Model):
     name = models.CharField(max_length=7, unique=True)
-    head = models.ForeignKey(ScheduleUser, on_delete=models.SET_NULL, null=True, blank=True)
+    head = models.ForeignKey(
+        ScheduleUser, on_delete=models.SET_NULL, null=True, blank=True
+    )
     course = models.SmallIntegerField(default=None, null=True)
 
     def add_user(self, user: ScheduleUser):
@@ -21,7 +32,7 @@ class StudentGroup(models.Model):
         self.save()
 
     def get_schedule(self, day, week: int) -> list:
-        lessons = Lesson.objects.lesson_set.filter(weekday=day)
+        lessons = self.lesson_set.select_related().filter(weekday=day)
         schedule = []
         for lesson in lessons:
             week_list = int_to_weeks(lesson.weeks)

@@ -13,6 +13,7 @@ class State(Enum):
     SIGNING_IN_CONFIRM_PASS = 7
     LOGING_IN_PASS = 8
     LOGING_IN_UNAME = 9
+    ON_ACTIONS = 10
 
 
 def onstate(chat_id: Chat, enum_states) -> bool:
@@ -26,5 +27,17 @@ def onstate(chat_id: Chat, enum_states) -> bool:
 def authorized(chat_id: Chat) -> bool:
     try:
         return Chat.objects.get(chat_id=chat_id).authorised
+    except:
+        return False
+
+
+def group_member(chat_id: Chat) -> bool:
+    try:
+        chat = Chat.objects.get(chat_id=chat_id)
+        user = chat.connected_user
+        if user != None:
+            if user.group != None:
+                return True
+        return False
     except:
         return False

@@ -1,7 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser, Group
-)
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Group
+
 
 class ScheduleUserManager(BaseUserManager):
     def create_user(self, username, first_name, last_name, password=None):
@@ -10,13 +9,9 @@ class ScheduleUserManager(BaseUserManager):
         birth and password.
         """
         if not username:
-            raise ValueError('Users must have: [username, first name, last_name]')
+            raise ValueError("Users must have: [username, first name, last_name]")
 
-        user = self.model(
-            username = username,
-            first_name = first_name,
-            last_name = last_name
-        )
+        user = self.model(username=username, first_name=first_name, last_name=last_name)
 
         user.set_password(password)
         user.save(using=self._db)
@@ -31,7 +26,7 @@ class ScheduleUserManager(BaseUserManager):
             username=username,
             first_name=first_name,
             last_name=last_name,
-            password=password
+            password=password,
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -40,7 +35,7 @@ class ScheduleUserManager(BaseUserManager):
 
 class ScheduleUser(AbstractBaseUser):
     username = models.CharField(
-        verbose_name='username',
+        verbose_name="username",
         max_length=32,
         unique=True,
     )
@@ -49,12 +44,11 @@ class ScheduleUser(AbstractBaseUser):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    
 
     objects = ScheduleUserManager()
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['USERNAME_FIELD', 'first_name', 'last_name']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["USERNAME_FIELD", "first_name", "last_name"]
 
     def __str__(self):
         return self.username

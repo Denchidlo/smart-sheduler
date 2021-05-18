@@ -4,5 +4,5 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
-    path('', csrf_exempt(BotResponcer.as_view()), name='update'),
+    path("", csrf_exempt(BotResponcer.as_view()), name="update"),
 ]
