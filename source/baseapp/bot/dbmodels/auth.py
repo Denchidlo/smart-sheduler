@@ -44,7 +44,7 @@ class ScheduleUser(AbstractBaseUser):
     last_name = models.CharField(max_length=32)
     from .group import StudentGroup
     group = models.ForeignKey(StudentGroup, on_delete=models.SET_NULL, null=True, blank=True)
-    request_group = models.ForeignKey(StudentGroup, on_delete=models.SET_NULL, null=True, blank=True)
+    is_member = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -78,7 +78,7 @@ class ScheduleUser(AbstractBaseUser):
         return [el.chat_id for el in chat_list]
 
     def get_requests(self, group, page):
-        req_users = ScheduleUser.objects.filter(request_group=group).order_by("id")
+        req_users = ScheduleUser.objects.filter(group=group, is_member=False).order_by("id")
         return req_users[5 * page : 5 * (page + 1)], len(req_users)
 
     

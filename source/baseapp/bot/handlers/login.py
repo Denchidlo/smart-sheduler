@@ -51,6 +51,7 @@ def login_password_input(message):
     ):
         chat.authorised = True
         bot.send_message(chat_id, "Success!")
+        chat.state = State.NO_ACTIONS.value
         keyboard(chat)
     else:
         chat.connected_user = None

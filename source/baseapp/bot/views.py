@@ -2,7 +2,6 @@ from .dbmodels.validators import validate_username
 from .dbmodels.chat import Chat
 from .dbmodels.states import State, onstate
 from .dbmodels.auth import ScheduleUser
-from .handlers import login, signin, authorised, unauthorised
 from .services.bot_init import bot
 from django.http import HttpResponse
 from django.views import View
@@ -87,3 +86,5 @@ def cmd_cancel_handler(message):
     else:
         unauthorised.keyboard(chat)
     chat.save()
+
+from .handlers import login, signin, authorised, unauthorised, groups, schedule

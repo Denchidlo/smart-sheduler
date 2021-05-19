@@ -42,7 +42,7 @@ def request_group_input(chat, message_input):
     chat_id = chat.chat_id
     try:
         group = StudentGroup.objects.get(name=message_input)
-        chat.connected_user.request_group = group
+        chat.connected_user.group = group
         group.save()
         chat.connected_user.save()
         bot.send_message(chat_id, "Request was sent!")
@@ -69,7 +69,7 @@ def notify_group_input(chat, message_input):
 
 
 @bot.callback_query_handler(
-    func=lambda call: re.match(r"^group=\d{6}\|cmd=[a-z]{4,10}$")
+    func=lambda call: re.match(r"^group=\d{6}\|cmd=[a-z]{4,10}$", call.data)
 )
 def group_action_handler(call: types.CallbackQuery):
     message: types.types.Message = call.message
@@ -112,7 +112,7 @@ def group_action_handler(call: types.CallbackQuery):
 
 
 @bot.callback_query_handler(
-    func=lambda call: re.fullmatch(r"group=\d{6}\|cmd=membership\|page=[0-9]$")
+    func=lambda call: re.fullmatch(r"group=\d{6}\|cmd=membership\|page=[0-9]$", call.data)
 )
 def group_requests_handler(call: types.CallbackQuery):
     message: types.types.Message = call.message

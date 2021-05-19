@@ -29,27 +29,32 @@ def authorised_actions_handler(message: types.Message):
         if request == "Logout 🚶‍♂️":
             button_logout(chat)
             return
-        keyboard(chat)
-        bot.reply_to(message, "Oops, i don't know what to do with it!")
         return
     elif state == State.ON_ACTIONS.value:
         if request == "Get schedule":
             button_get_schedule(chat)
+            return
         elif request == "Group":
             button_group(chat)
+            return
         elif request == "Requet group membership":
             button_request_membership(chat)
+            return
         elif request == "Back to keyboard":
             button_back_to_keyboard(chat)
+            return
         button_actions(chat)
         bot.reply_to(message, "Oops, i don't know what to do with it!")
         return
     elif state == State.ON_ACTION_SCHEDULE_GROUP_ENTER.value:
         schedule_group_input(chat, request)
+        return
     elif state == State.ON_ACTION_NOTIFY.value:
         notify_group_input(chat, request)
+        return
     elif state == State.ON_GROUP_REQUEST_NAME.value:
         request_group_input(chat, request)
+        return
     else:
         keyboard(chat)
         bot.reply_to(message, "Oops, i don't know what to do with it!")
@@ -76,10 +81,10 @@ def button_logout(chat):
     chat.state = State.NO_ACTIONS.value
     chat.connected_user = None
     chat.authorised = False
+    chat.save() 
     bot.send_message(
         chat_id, "You successfuly logged out\nPrint command /start to use bot"
     )
-    chat.save()
 
 
 def button_actions(chat):
@@ -100,4 +105,5 @@ def button_actions(chat):
 
 def button_back_to_keyboard(chat):
     chat.state = State.NO_ACTIONS.value
+    chat.save()
     keyboard(chat)

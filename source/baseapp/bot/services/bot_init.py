@@ -9,7 +9,7 @@ __author__ = "@schedulebase_bot"
 if settings.DEBUG:
     logger.setLevel(logging.DEBUG)  # Outputs debug messages to console.
 
-    if settings.DATA_UPLOAD:
+    if not settings.DATA_UPLOAD:
         try:
             ScheduleUser.objects.get(username="admin")
         except:
