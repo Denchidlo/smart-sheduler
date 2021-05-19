@@ -3,6 +3,7 @@ from requests.models import HTTPError
 from ..dbmodels.employee import Employee
 from ..dbmodels.group import StudentGroup
 from ..dbmodels.schedule import Lesson, weekday_to_int, weeks_to_int
+from django.conf import settings
 from enum import Enum
 from datetime import time
 import requests as req
@@ -17,6 +18,7 @@ class RequestStrings(Enum):
     )
     GET_ALL_GROUPS = "https://journal.bsuir.by/api/v1/groups"
     GET_ALL_EMPLOYEES = "https://journal.bsuir.by/api/v1/employees"
+    GET_CURRENT_WEEK = "http://journal.bsuir.by/api/v1/week"
 
 
 class ScheduleProvider:
@@ -74,3 +76,6 @@ class ScheduleProvider:
                     code=bsuir_api_responce.status_code, req_str=request_string
                 )
             )
+
+
+settings.CURRENT_WEEK = ScheduleProvider().make_request(RequestStrings.GET_CURRENT_WEEK.value)

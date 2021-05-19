@@ -1,3 +1,5 @@
+from source.baseapp.bot.dbmodels.schedule import Lesson
+from typing import Iterable
 from .auth import ScheduleUser
 from django.db import models
 
@@ -31,7 +33,7 @@ class StudentGroup(models.Model):
         self.head = user
         self.save()
 
-    def get_schedule(self, day, week: int) -> list:
+    def get_schedule(self, day, week: int) -> Iterable[Lesson]:
         lessons = self.lesson_set.select_related().filter(weekday=day)
         schedule = []
         for lesson in lessons:

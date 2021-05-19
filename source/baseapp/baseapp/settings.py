@@ -36,6 +36,7 @@ with open(f"{BASE_DIR}/appsettings.json", "r") as reader:
     DOMAIN = json_doc["domain"]
     DATA_UPLOAD = json_doc["data-fetching"]
 
+CURRENT_WEEK = None
 
 ALLOWED_HOSTS = [settings.DOMAIN, "0.0.0.0"]
 # Application definition

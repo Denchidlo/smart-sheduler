@@ -1,9 +1,13 @@
+from .schedule import button_get_schedule
+from .groups import button_group
 from .common_objects import *
 from telebot import types
 
 handled_states = [
     State.NO_ACTIONS,
     State.ON_ACTIONS,
+    State.ON_ACTION_SCHEDULE,
+    State.ON
 ]
 
 
@@ -26,16 +30,19 @@ def authorised_actions_handler(message: types.Message):
             return
         keyboard(chat)
         return
-    elif state == State.ON_ACTIONS:
+    elif state == State.ON_ACTIONS.value:
         if request == "Get schedule":
-            pass
-        elif request == "Find employee":
-            pass
-        elif request == "Find employee":
-            pass
-        elif request == "Find employee":
-            pass
+            button_get_schedule(chat)
+        elif request == "Group":
+            button_group(chat)
+        elif request == "Requet group membership":
+            button_request_membership(chat)
+        elif request == "Back to keyboard":
+            button_back_to_keyboard(chat)
         button_actions(chat)
+        return
+    elif state == State.ON_ACTION_SCHEDULE_GROUP_ENTER.value:
+        pass
 
 
 def keyboard(chat):
@@ -70,13 +77,12 @@ def button_actions(chat):
     chat.state = State.ON_ACTIONS.value
     markup = types.ReplyKeyboardMarkup(row_width=2, one_time_keyboard=True)
     get_schedule = types.KeyboardButton("Get schedule")
-    get_employee = types.KeyboardButton("Find employee")
     if group_member(chat_id):
         group_actions = types.KeyboardButton("Group")
     else:
         group_actions = types.KeyboardButton("Requet group membership")
     back_to_action = types.KeyboardButton("Back to keyboard")
-    markup.add(get_employee, get_schedule)
+    markup.add(get_schedule)
     markup.add(group_actions, back_to_action)
     bot.send_message(chat_id, "Actions:", reply_markup=markup)
     chat.save()

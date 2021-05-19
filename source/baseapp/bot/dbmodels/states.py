@@ -14,6 +14,11 @@ class State(Enum):
     LOGING_IN_PASS = 8
     LOGING_IN_UNAME = 9
     ON_ACTIONS = 10
+    ON_ACTION_SCHEDULE = 11
+    ON_ACTION_EMPLOYEE = 12
+    ON_ACTION_SCHEDULE_GROUP_ENTER = 13
+    ON_ACTION_SCHEDULE_DAY_ENTER = 14
+    ON_ACTION_SCHEDULE_WEEK_ENTER = 15
 
 
 def onstate(chat_id: Chat, enum_states) -> bool:

@@ -11,5 +11,7 @@ from ..dbmodels.schedule import (
     int_to_weeks,
     weeks_to_int,
     weekday_to_int,
+    next_schedule_string, 
+    prev_schedule_string
 )
 from telebot import types
