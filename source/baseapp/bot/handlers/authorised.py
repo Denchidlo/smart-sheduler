@@ -1,13 +1,14 @@
-from .schedule import button_get_schedule
-from .groups import button_group
+from .schedule import button_get_schedule, schedule_group_input
+from .groups import button_group, button_request_membership, notify_group_input, request_group_input
 from .common_objects import *
 from telebot import types
 
 handled_states = [
     State.NO_ACTIONS,
     State.ON_ACTIONS,
-    State.ON_ACTION_SCHEDULE,
-    State.ON
+    State.ON_GROUP_REQUEST_NAME,
+    State.ON_ACTION_SCHEDULE_GROUP_ENTER,
+    State.ON_ACTION_NOTIFY,
 ]
 
 
@@ -29,6 +30,7 @@ def authorised_actions_handler(message: types.Message):
             button_logout(chat)
             return
         keyboard(chat)
+        bot.reply_to(message, "Oops, i don't know what to do with it!")
         return
     elif state == State.ON_ACTIONS.value:
         if request == "Get schedule":
@@ -40,9 +42,17 @@ def authorised_actions_handler(message: types.Message):
         elif request == "Back to keyboard":
             button_back_to_keyboard(chat)
         button_actions(chat)
+        bot.reply_to(message, "Oops, i don't know what to do with it!")
         return
     elif state == State.ON_ACTION_SCHEDULE_GROUP_ENTER.value:
-        pass
+        schedule_group_input(chat, request)
+    elif state == State.ON_ACTION_NOTIFY.value:
+        notify_group_input(chat, request)
+    elif state == State.ON_GROUP_REQUEST_NAME.value:
+        request_group_input(chat, request)
+    else:
+        keyboard(chat)
+        bot.reply_to(message, "Oops, i don't know what to do with it!")
 
 
 def keyboard(chat):

@@ -1,5 +1,5 @@
 from django.db import models
-from .dbmodels.auth import ScheduleUser, ScheduleUserManager
+from .dbmodels.auth import ScheduleUser, ScheduleUserManager, GroupLead
 from .dbmodels.chat import Chat
 from .dbmodels.employee import Employee
 from .dbmodels.schedule import Lesson

@@ -1,8 +1,8 @@
-from .group import StudentGroup
 from .employee import Employee
 from django.db import models
-from django.conf import settings
+from .group import StudentGroup
 from enum import Enum
+
 
 class WeekDay(Enum):
     NULL_DAY = (0, "NULL_DAY")
@@ -48,18 +48,20 @@ def int_to_weeks(hashed_weeks: int) -> list:
 def next_schedule_string(group, day, week):
     absolute = 6 * (week - 1) + (day - 1)
     absolute += 1
-    absolute  = absolute % 24
-    new_day = int(absolute) % 6 + 1 
+    absolute = absolute % 24
+    new_day = int(absolute) % 6 + 1
     new_week = int(absolute) // 6 + 1
     return f"group={group}|day={new_day}|week={new_week}"
+
 
 def prev_schedule_string(group, day, week):
     absolute = 6 * (week - 1) + (day - 1)
     absolute -= 1
-    absolute  = absolute % 24
-    new_day = int(absolute) % 6 + 1 
+    absolute = absolute % 24
+    new_day = int(absolute) % 6 + 1
     new_week = int(absolute) // 6 + 1
     return f"group={group}|day={new_day}|week={new_week}"
+
 
 class Week(Enum):
     FIRST = 1

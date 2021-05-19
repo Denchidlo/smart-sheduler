@@ -1,5 +1,6 @@
+from .group import StudentGroup
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Group
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class ScheduleUserManager(BaseUserManager):
@@ -41,8 +42,9 @@ class ScheduleUser(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
-    request_group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
+    from .group import StudentGroup
+    group = models.ForeignKey(StudentGroup, on_delete=models.SET_NULL, null=True, blank=True)
+    request_group = models.ForeignKey(StudentGroup, on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -69,3 +71,17 @@ class ScheduleUser(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+    def get_chatlist(self, group):
+        members = ScheduleUser.objects.filter(group=group)
+        chat_list = members.chat_set.select_relaced()
+        return [el.chat_id for el in chat_list]
+
+    def get_requests(self, group, page):
+        req_users = ScheduleUser.objects.filter(request_group=group).order_by("id")
+        return req_users[5 * page : 5 * (page + 1)], len(req_users)
+
+    
+class GroupLead(models.Model):
+    group = models.OneToOneField(StudentGroup, unique=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(ScheduleUser, null=True, blank=True, default=None, on_delete=models.SET_NULL)

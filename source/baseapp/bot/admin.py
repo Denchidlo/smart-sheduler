@@ -9,8 +9,12 @@ admin.site.unregister(Group)
 admin.site.register(ScheduleUser, UserAdmin)
 admin.site.register(Chat)
 admin.site.register(Employee)
+admin.site.register(GroupLead)
 admin.site.register(Lesson)
 admin.site.register(StudentGroup)
 
 if settings.DATA_UPLOAD:
     ScheduleProvider().load()
+
+    for el in StudentGroup.objects.all():
+        GroupLead.objects.get_or_create(group=el, defaults={"user":None})

@@ -78,4 +78,6 @@ class ScheduleProvider:
             )
 
 
-settings.CURRENT_WEEK = ScheduleProvider().make_request(RequestStrings.GET_CURRENT_WEEK.value)
+settings.CURRENT_WEEK = ScheduleProvider().make_request(
+    RequestStrings.GET_CURRENT_WEEK.value
+)
