@@ -20,3 +20,7 @@ class Chat(models.Model):
             return cls.objects.get(chat_id=chat_id)
         except:
             return None
+
+    def get_chatlist(self, group):
+        chat_list = Chat.objects.filter(connected_user__group__name=group.name)
+        return [el.chat_id for el in chat_list]

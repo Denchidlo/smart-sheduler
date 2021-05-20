@@ -1,7 +1,7 @@
 from django.conf import settings
 from ..dbmodels.auth import ScheduleUser
 import time
-from telebot import TeleBot, logger
+from telebot import TeleBot, logger, types
 import logging
 
 __author__ = "@schedulebase_bot"
@@ -13,9 +13,18 @@ if settings.DEBUG:
         try:
             ScheduleUser.objects.get(username="admin")
         except:
-            ScheduleUser.objects.create_superuser("admin", "Чепуха", "Костлявая", "admin")
+            ScheduleUser.objects.create_superuser(
+                "admin", "Чепуха", "Костлявая", "admin"
+            )
 
 bot = TeleBot(settings.TOKEN)
+
+bot.set_my_commands(
+    [
+        types.BotCommand("start", "Begin authentification"),
+        types.BotCommand("cancel", "Interrupt all actions, get to the stable state"),
+    ]
+)
 
 settings.BOT = bot
 

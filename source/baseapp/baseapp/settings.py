@@ -27,6 +27,8 @@ SECRET_KEY = "django-insecure-q)@jybh1fian*463=ps33lq71tkqj%m^u!bg6ptyr%qfux=hf4
 
 AUTH_USER_MODEL = "bot.ScheduleUser"
 
+PROCEEDED = False
+
 # SECURITY WARNING: don't run with debug turned on in production!
 
 with open(f"{BASE_DIR}/appsettings.json", "r") as reader:

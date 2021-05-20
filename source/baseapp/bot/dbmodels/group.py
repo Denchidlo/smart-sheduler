@@ -29,7 +29,11 @@ class StudentGroup(models.Model):
         self.save()
 
     def get_schedule(self, day, week: int):
-        lessons = self.lesson_set.select_related().filter(weekday=day)
+        lessons = (
+            self.lesson_set.select_related()
+            .filter(weekday=day)
+            .order_by("lesson_start")
+        )
         schedule = []
         for lesson in lessons:
             week_list = int_to_weeks(lesson.weeks)

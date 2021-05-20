@@ -43,7 +43,10 @@ class ScheduleUser(AbstractBaseUser):
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
     from .group import StudentGroup
-    group = models.ForeignKey(StudentGroup, on_delete=models.SET_NULL, null=True, blank=True)
+
+    group = models.ForeignKey(
+        StudentGroup, on_delete=models.SET_NULL, null=True, blank=True
+    )
     is_member = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -72,16 +75,15 @@ class ScheduleUser(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
-    def get_chatlist(self, group):
-        members = ScheduleUser.objects.filter(group=group)
-        chat_list = members.chat_set.select_relaced()
-        return [el.chat_id for el in chat_list]
-
     def get_requests(self, group, page):
-        req_users = ScheduleUser.objects.filter(group=group, is_member=False).order_by("id")
+        req_users = ScheduleUser.objects.filter(group=group, is_member=False).order_by(
+            "id"
+        )
         return req_users[5 * page : 5 * (page + 1)], len(req_users)
 
-    
+
 class GroupLead(models.Model):
     group = models.OneToOneField(StudentGroup, unique=True, on_delete=models.CASCADE)
-    user = models.OneToOneField(ScheduleUser, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    user = models.OneToOneField(
+        ScheduleUser, null=True, blank=True, default=None, on_delete=models.SET_NULL
+    )

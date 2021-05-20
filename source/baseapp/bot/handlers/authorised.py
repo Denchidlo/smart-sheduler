@@ -1,5 +1,10 @@
 from .schedule import button_get_schedule, schedule_group_input
-from .groups import button_group, button_request_membership, notify_group_input, request_group_input
+from .groups import (
+    button_group,
+    button_request_membership,
+    notify_group_input,
+    request_group_input,
+)
 from .common_objects import *
 from telebot import types
 
@@ -29,6 +34,7 @@ def authorised_actions_handler(message: types.Message):
         if request == "Logout 🚶‍♂️":
             button_logout(chat)
             return
+        keyboard(chat)
         return
     elif state == State.ON_ACTIONS.value:
         if request == "Get schedule":
@@ -37,7 +43,7 @@ def authorised_actions_handler(message: types.Message):
         elif request == "Group":
             button_group(chat)
             return
-        elif request == "Requet group membership":
+        elif request == "Request group membership":
             button_request_membership(chat)
             return
         elif request == "Back to keyboard":
@@ -81,7 +87,7 @@ def button_logout(chat):
     chat.state = State.NO_ACTIONS.value
     chat.connected_user = None
     chat.authorised = False
-    chat.save() 
+    chat.save()
     bot.send_message(
         chat_id, "You successfuly logged out\nPrint command /start to use bot"
     )
@@ -95,7 +101,7 @@ def button_actions(chat):
     if group_member(chat_id):
         group_actions = types.KeyboardButton("Group")
     else:
-        group_actions = types.KeyboardButton("Requet group membership")
+        group_actions = types.KeyboardButton("Request group membership")
     back_to_action = types.KeyboardButton("Back to keyboard")
     markup.add(get_schedule)
     markup.add(group_actions, back_to_action)
