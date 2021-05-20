@@ -6,7 +6,7 @@ from telebot import types
 def button_get_schedule(chat):
     chat_id = chat.chat_id
     chat.state = State.ON_ACTION_SCHEDULE_GROUP_ENTER.value
-    bot.send_message(chat_id, "Set group number:")
+    bot.send_message(chat_id, "Set group number:", reply_markup=CANCEL_MARKUP)
     chat.save()
 
 
@@ -118,6 +118,7 @@ def lesson_info(call):
     preparsed_values = call.data.split("|")
     lesson_id = int(preparsed_values[0].split("=")[1])
     call_data = call.data.split("(")[1].split(")")[0]
+    print(call_data)
     lesson = Lesson.objects.get(id=lesson_id)
     responce_message = f"Subject:{lesson.subject}\nAuditory:{lesson.auditory[1:-1]}\nDuration:{lesson.lesson_time}\nEmployee: {lesson.employee.fio}"
     markup = types.InlineKeyboardMarkup()

@@ -9,13 +9,13 @@ def button_login(call: types.CallbackQuery):
         chat_id = callback_message.chat.id
         chat = Chat.objects.get(chat_id=chat_id)
         if not chat.authorised:
-            bot.send_message(chat_id, "Enter username:")
+            bot.send_message(chat_id, "Enter username:", reply_markup=CANCEL_MARKUP)
             chat.state = State.LOGING_IN_UNAME.value
             chat.save()
         else:
-            bot.send_message(chat_id, "You need to logout first")
+            bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
     except Exception as ex:
-        bot.send_message(callback_message.chat.id, "Something went wrong\nTry again")
+        bot.send_message(callback_message.chat.id, "Something went wrong\nTry again", reply_markup=CANCEL_MARKUP)
 
 
 @bot.message_handler(
@@ -34,7 +34,7 @@ def login_username_input(message):
         user = None
     chat.state = State.LOGING_IN_PASS.value
     chat.save()
-    bot.send_message(chat_id, "Enter password:")
+    bot.send_message(chat_id, "Enter password:", reply_markup=CANCEL_MARKUP)
 
 
 @bot.message_handler(
@@ -56,8 +56,8 @@ def login_password_input(message):
     else:
         chat.connected_user = None
         bot.send_message(
-            chat_id, "Login failed!\nIvalid username or password\Try again:"
+            chat_id, "Login failed!\nIvalid username or password\nTry again:"
         )
-        bot.send_message(chat_id, "Enter username:")
+        bot.send_message(chat_id, "Enter username:", reply_markup=CANCEL_MARKUP)
         chat.state = State.LOGING_IN_UNAME.value
     chat.save()

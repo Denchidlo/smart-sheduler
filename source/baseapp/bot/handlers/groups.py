@@ -39,7 +39,7 @@ def button_group(chat):
 def button_request_membership(chat):
     chat_id = chat.chat_id
     chat.state = State.ON_GROUP_REQUEST_NAME.value
-    bot.send_message(chat_id, "Set group name:")
+    bot.send_message(chat_id, "Set group name:", reply_markup=CANCEL_MARKUP)
     chat.save()
 
 
@@ -63,7 +63,7 @@ def request_group_input(chat, message_input):
         chat.save()
     except:
         bot.send_message(
-            chat_id, "Invalid group name!\n\nTry again:\nSet group name:")
+            chat_id, "Invalid group name!\n\nTry again:\nSet group name:", reply_markup=CANCEL_MARKUP)
 
 
 def notify_group_input(chat, message_input):
@@ -203,7 +203,6 @@ def group_requests_handler(call: types.CallbackQuery):
     )
 )
 def user_request_desision(call: types.CallbackQuery):
-    print("PASSED")
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     preparsed_values = call.data.split("|")
@@ -242,7 +241,6 @@ def user_request_desision_handler(call: types.CallbackQuery):
     decision = preparsed_values[1].split("=")[1].split("_")[1]
     user_id = int(preparsed_values[2].split("=")[1])
     user = ScheduleUser.objects.get(id=user_id)
-    print(decision)
     if decision == "accept":
         user.is_member = True
         user.save()

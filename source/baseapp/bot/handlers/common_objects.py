@@ -14,4 +14,6 @@ from ..dbmodels.schedule import (
     next_schedule_string,
     prev_schedule_string,
 )
+from .templates import *
 from telebot import types
+

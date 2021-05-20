@@ -69,14 +69,10 @@ def authorised_actions_handler(message: types.Message):
 def keyboard(chat):
     user = chat.connected_user
     if user != None:
-        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, row_width=1)
-        actions_button = types.KeyboardButton("Actions 📋")
-        logout_button = types.KeyboardButton("Logout 🚶‍♂️")
-        markup.add(actions_button, logout_button)
         bot.send_message(
             chat.chat_id,
             text="What do you want, {username}".format(username=user.first_name),
-            reply_markup=markup,
+            reply_markup=AUTHORISED_KB_MARKUP,
         )
     else:
         raise ValueError("Unauthorised access of authorised.keyboard")
@@ -98,7 +94,7 @@ def button_actions(chat):
     chat.state = State.ON_ACTIONS.value
     markup = types.ReplyKeyboardMarkup(row_width=2, one_time_keyboard=True)
     get_schedule = types.KeyboardButton("Get schedule")
-    if group_member(chat_id):
+    if chat.connected_user.is_member == True and chat.connected_user.group != None:
         group_actions = types.KeyboardButton("Group")
     else:
         group_actions = types.KeyboardButton("Request group membership")

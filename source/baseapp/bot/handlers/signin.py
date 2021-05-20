@@ -9,13 +9,13 @@ def button_signin(call: types.CallbackQuery):
         chat_id = callback_message.chat.id
         chat = Chat.objects.get(chat_id=chat_id)
         if not chat.authorised:
-            bot.send_message(chat_id, "Enter username:")
+            bot.send_message(chat_id, "Enter username:", reply_markup=CANCEL_MARKUP)
             chat.state = State.SIGNING_IN_UNAME.value
             chat.save()
         else:
-            bot.send_message(chat_id, "You need to logout first")
+            bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
     except Exception:
-        bot.send_message(callback_message.chat.id, "Something went wrong\nTry again")
+        bot.send_message(callback_message.chat.id, "Something went wrong\nTry again", reply_markup=CANCEL_MARKUP)
 
 
 @bot.message_handler(
@@ -62,7 +62,7 @@ def signin_data_input(message):
         chat.connected_user.save()
     else:
         responce_message = "Name and lastname should be from 5 to 30 and consist of letters\n\nTry again:"
-    bot.send_message(chat_id, responce_message)
+    bot.send_message(chat_id, responce_message, reply_markup=CANCEL_MARKUP)
     chat.save()
 
 
@@ -102,4 +102,4 @@ def signin_password_input(message):
     
     Try again:"""
     chat.save()
-    bot.send_message(chat_id, responce_message)
+    bot.send_message(chat_id, responce_message, reply_markup=CANCEL_MARKUP if responce_message != "Success ✔️" else None)

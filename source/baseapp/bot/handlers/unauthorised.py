@@ -56,37 +56,31 @@ def unauthorised_actions_handler(message: types.Message):
 def button_login(chat):
     chat_id = chat.chat_id
     if not chat.authorised:
-        bot.send_message(chat_id, "Enter username:")
+        bot.send_message(chat_id, "Enter username:", reply_markup=CANCEL_MARKUP)
         chat.state = State.LOGING_IN_UNAME.value
         chat.save()
     else:
-        bot.send_message(chat_id, "You need to logout first")
+        bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
 
 
 def button_signin(chat):
     chat_id = chat.chat_id
     chat = Chat.objects.get(chat_id=chat_id)
     if not chat.authorised:
-        bot.send_message(chat_id, "Enter username:")
+        bot.send_message(chat_id, "Enter username:", reply_markup=CANCEL_MARKUP)
         chat.state = State.SIGNING_IN_UNAME.value
         chat.save()
     else:
-        bot.send_message(chat_id, "You need to logout first")
+        bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
 
 
 def keyboard(chat):
     user = chat.connected_user
     if user == None:
-        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, row_width=1)
-        actions_button = types.KeyboardButton("Actions 📋")
-        login_button = types.KeyboardButton("Login")
-        signin_button = types.KeyboardButton("Sign in")
-        markup.add(actions_button)
-        markup.row(login_button, signin_button)
         bot.send_message(
             chat.chat_id,
             text="What do you want, stranger?",
-            reply_markup=markup,
+            reply_markup=UNAUTHORISED_KB_MARKUP,
         )
     else:
         raise ValueError("Unauthorised access of authorised.keyboard")
@@ -95,12 +89,7 @@ def keyboard(chat):
 def button_actions(chat):
     chat_id = chat.chat_id
     chat.state = State.ON_ACTIONS.value
-    markup = types.ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True)
-    get_schedule = types.KeyboardButton("Get schedule")
-    back_to_action = types.KeyboardButton("Back to keyboard")
-    markup.add(get_schedule)
-    markup.add(back_to_action)
-    bot.send_message(chat_id, "Actions:", reply_markup=markup)
+    bot.send_message(chat_id, "Actions:", reply_markup=UNAUTHORISED_ACTIONS_MARKUP)
     chat.save()
 
 
