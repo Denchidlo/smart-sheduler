@@ -27,8 +27,10 @@ def button_group(chat):
                 "Requests",
                 callback_data=f"group={group.name}|cmd=membership|page=0",
             )
-        markup.add(group_info, group_schedule,
+            markup.add(group_info, group_schedule,
                    notify_all_button, membership_requests)
+        else:
+            markup.add(group_info, group_schedule)
         bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
     except:
         pass

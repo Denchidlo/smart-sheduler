@@ -97,7 +97,7 @@ def signin_password_input(message):
 
     Should have at least one number.
     Should have at least one uppercase and one lowercase character.
-    Should have at least one special symbol.
+    Should have at least one special symbol (In most case just add one #).
     Should be between 6 to 20 characters long.
     
     Try again:"""
