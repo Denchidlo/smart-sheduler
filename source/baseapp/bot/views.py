@@ -90,6 +90,20 @@ def cmd_cancel_handler(message):
 
 from .handlers import login, signin, authorised, unauthorised, groups, schedule
 
-@bot.message_handler(func=lambda message: True, content_types=['audio', 'photo', 'voice', 'video', 'document', 'text', 'location', 'contact', 'sticker']) 
+
+@bot.message_handler(
+    func=lambda message: True,
+    content_types=[
+        "audio",
+        "photo",
+        "voice",
+        "video",
+        "document",
+        "text",
+        "location",
+        "contact",
+        "sticker",
+    ],
+)
 def default_handler(message):
     bot.reply_to(message, "I have no idea what is it...")

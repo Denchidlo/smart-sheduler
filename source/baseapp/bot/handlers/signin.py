@@ -13,9 +13,15 @@ def button_signin(call: types.CallbackQuery):
             chat.state = State.SIGNING_IN_UNAME.value
             chat.save()
         else:
-            bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
+            bot.send_message(
+                chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP
+            )
     except Exception:
-        bot.send_message(callback_message.chat.id, "Something went wrong\nTry again", reply_markup=CANCEL_MARKUP)
+        bot.send_message(
+            callback_message.chat.id,
+            "Something went wrong\nTry again",
+            reply_markup=CANCEL_MARKUP,
+        )
 
 
 @bot.message_handler(
@@ -102,4 +108,8 @@ def signin_password_input(message):
     
     Try again:"""
     chat.save()
-    bot.send_message(chat_id, responce_message, reply_markup=CANCEL_MARKUP if responce_message != "Success ✔️" else None)
+    bot.send_message(
+        chat_id,
+        responce_message,
+        reply_markup=CANCEL_MARKUP if responce_message != "Success ✔️" else None,
+    )

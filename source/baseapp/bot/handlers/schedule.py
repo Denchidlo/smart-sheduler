@@ -51,23 +51,17 @@ def weekday_input_handler(call: types.CallbackQuery):
     message: types.types.Message = call.message
     callback_template = f"{call.data}|week="
     markup = types.InlineKeyboardMarkup(row_width=2)
-    button_1 = types.InlineKeyboardButton(
-        "1", callback_data=callback_template + "1"
-    )
-    button_2 = types.InlineKeyboardButton(
-        "2", callback_data=callback_template + "2"
-    )
-    button_3 = types.InlineKeyboardButton(
-        "3", callback_data=callback_template + "3"
-    )
-    button_4 = types.InlineKeyboardButton(
-        "4", callback_data=callback_template + "4"
-    )
+    button_1 = types.InlineKeyboardButton("1", callback_data=callback_template + "1")
+    button_2 = types.InlineKeyboardButton("2", callback_data=callback_template + "2")
+    button_3 = types.InlineKeyboardButton("3", callback_data=callback_template + "3")
+    button_4 = types.InlineKeyboardButton("4", callback_data=callback_template + "4")
     markup.row(button_1, button_2)
     markup.row(button_3, button_4)
     bot.edit_message_text(
         "Choose week:",
-        chat_id=message.chat.id, message_id=message.message_id, reply_markup=markup
+        chat_id=message.chat.id,
+        message_id=message.message_id,
+        reply_markup=markup,
     )
 
 
@@ -99,13 +93,16 @@ def week_input_handler(call: types.CallbackQuery):
         "⬅️", prev_schedule_string(group, day, week)
     )
     # schedule_markup.add(prev_button, next_button)
-    responce_message = f"Group:{group.name}\nDay:{int_to_weekday(day).value[1]}\nWeek:{week}"
+    responce_message = (
+        f"Group:{group.name}\nDay:{int_to_weekday(day).value[1]}\nWeek:{week}"
+    )
     bot.edit_message_text(
         text=responce_message,
         chat_id=message.chat.id,
         message_id=message.message_id,
         reply_markup=schedule_markup,
     )
+
 
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
@@ -122,8 +119,7 @@ def lesson_info(call):
     lesson = Lesson.objects.get(id=lesson_id)
     responce_message = f"Subject:{lesson.subject}\nAuditory:{lesson.auditory[1:-1]}\nDuration:{lesson.lesson_time}\nEmployee: {lesson.employee.fio}"
     markup = types.InlineKeyboardMarkup()
-    button_back = types.InlineKeyboardButton(
-        "Back", callback_data=call_data)
+    button_back = types.InlineKeyboardButton("Back", callback_data=call_data)
     markup.add(button_back)
     bot.edit_message_text(
         responce_message,

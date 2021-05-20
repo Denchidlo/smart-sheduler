@@ -13,9 +13,15 @@ def button_login(call: types.CallbackQuery):
             chat.state = State.LOGING_IN_UNAME.value
             chat.save()
         else:
-            bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
+            bot.send_message(
+                chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP
+            )
     except Exception as ex:
-        bot.send_message(callback_message.chat.id, "Something went wrong\nTry again", reply_markup=CANCEL_MARKUP)
+        bot.send_message(
+            callback_message.chat.id,
+            "Something went wrong\nTry again",
+            reply_markup=CANCEL_MARKUP,
+        )
 
 
 @bot.message_handler(

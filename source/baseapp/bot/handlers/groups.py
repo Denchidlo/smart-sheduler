@@ -27,8 +27,9 @@ def button_group(chat):
                 "Requests",
                 callback_data=f"group={group.name}|cmd=membership|page=0",
             )
-            markup.add(group_info, group_schedule,
-                   notify_all_button, membership_requests)
+            markup.add(
+                group_info, group_schedule, notify_all_button, membership_requests
+            )
         else:
             markup.add(group_info, group_schedule)
         bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
@@ -63,7 +64,10 @@ def request_group_input(chat, message_input):
         chat.save()
     except:
         bot.send_message(
-            chat_id, "Invalid group name!\n\nTry again:\nSet group name:", reply_markup=CANCEL_MARKUP)
+            chat_id,
+            "Invalid group name!\n\nTry again:\nSet group name:",
+            reply_markup=CANCEL_MARKUP,
+        )
 
 
 def notify_group_input(chat, message_input):

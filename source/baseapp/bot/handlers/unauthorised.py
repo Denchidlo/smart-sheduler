@@ -60,7 +60,9 @@ def button_login(chat):
         chat.state = State.LOGING_IN_UNAME.value
         chat.save()
     else:
-        bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
+        bot.send_message(
+            chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP
+        )
 
 
 def button_signin(chat):
@@ -71,7 +73,9 @@ def button_signin(chat):
         chat.state = State.SIGNING_IN_UNAME.value
         chat.save()
     else:
-        bot.send_message(chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP)
+        bot.send_message(
+            chat_id, "You need to logout first", reply_markup=CANCEL_MARKUP
+        )
 
 
 def keyboard(chat):
@@ -93,9 +97,7 @@ def button_actions(chat):
     chat.save()
 
 
-@bot.callback_query_handler(
-    func=lambda call: call.data == "c_anonym"
-)
+@bot.callback_query_handler(func=lambda call: call.data == "c_anonym")
 def anonym_handler(call):
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
