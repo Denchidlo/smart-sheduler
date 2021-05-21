@@ -1,7 +1,7 @@
 from django.conf import settings
 from ..dbmodels.auth import ScheduleUser
 import time
-from telebot import TeleBot, logger, types
+from telebot import AsyncTeleBot, logger, types
 import logging
 
 __author__ = "@schedulebase_bot"
@@ -18,7 +18,8 @@ if settings.DEBUG:
                 "admin", "Чепуха", "Костлявая", "admin"
             )
 
-bot = TeleBot(settings.TOKEN)
+bot = AsyncTeleBot(settings.TOKEN)
+bot.threaded = True
 
 bot.set_my_commands(
     [
