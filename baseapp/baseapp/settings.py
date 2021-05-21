@@ -42,6 +42,7 @@ PRODUCTION_MODE = bool(os.environ.get("PROD_MODE", default=False))
 
 if PRODUCTION_MODE:
     DOMAIN = os.environ.get("DOMAIN", default=None)
+    LOG_FILE="bottrace.log"
 else:
     time.sleep(5)
     responce = req.get("http://localhost:4040/api/tunnels")
@@ -64,7 +65,8 @@ DATA_UPLOAD = bool(os.environ.get("DEBUG", default=False))
 TOKEN = os.environ.get("API_TOKEN", default=None)
 CURRENT_WEEK = None
 
-logging.basicConfig(level=LOG_LEVEL)
+
+logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 
 ALLOWED_HOSTS = [settings.DOMAIN, "0.0.0.0"]
 # Application definition
