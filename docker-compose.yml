@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    network_mode: host
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db
+  web:
+    build: ./baseapp
+    command: python manage.py runserver 0:8000
+    volumes:
+      - ./baseapp/:/usr/src/baseapp/
+    network_mode: host
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+  ngrok:
+    image: wernight/ngrok
+    depends_on: 
+        - web
+    env_file: 
+        - ./ngrok/.env
+    network_mode: host
+volumes:
+  postgres_data:
