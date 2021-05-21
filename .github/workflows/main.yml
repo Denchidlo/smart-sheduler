@@ -20,3 +20,4 @@ jobs:
         with:
           docker_compose: 'docker-compose.yml' # required
           repo_token: "${{ secrets.REPO_TOKEN }}"
+          version: "webapp:v0.2"
