@@ -6,7 +6,7 @@ __pycache__
 appsettings.json
 
 # Self-added folders
-
+dev-launch
 
 # Virtual enviroment
-telebot-venv
+telebot-env

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import logging
 from pathlib import Path
 import json
+import time
+import requests as req
 import os
 
 from django.conf import settings
@@ -25,30 +27,44 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-q)@jybh1fian*463=ps33lq71tkqj%m^u!bg6ptyr%qfux=hf4"
+SECRET_KEY = os.environ.get("DOMAIN", default="asdasfas23i27rqwgerxsYA^S&DR^%ADC")
 
 AUTH_USER_MODEL = "bot.ScheduleUser"
-
-PROCEEDED = False
 
 # 'DJANGO_ALLOWED_HOSTS' должен быть в виде одной строки с хостами разделенными символом пробела
 # Для примера: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-with open(f"{BASE_DIR}/appsettings.json", "r") as reader:
-    json_doc = json.load(reader)
-    DEBUG = json_doc["debug"]
-    TOKEN = json_doc["api-token"]
-    DOMAIN = json_doc["domain"]
-    DATA_UPLOAD = json_doc["data-fetching"]
-    db_config = json_doc["database"]
+DEBUG = bool(os.environ.get("DEBUG", default=True))
+PRODUCTION_MODE = bool(os.environ.get("PROD_MODE", default=False))
 
-LOG_LEVEL = logging.NOTSET
+
+if PRODUCTION_MODE:
+    DOMAIN = os.environ.get("DOMAIN", default=None)
+else:
+    time.sleep(5)
+    responce = req.get("http://localhost:4040/api/tunnels")
+    if responce.status_code == 200:
+        ngrok_responce = responce.json()
+        tunnel = ngrok_responce["tunnels"][0]
+        print('\n\tServer public domain: "{domain}"\n'.format(domain=tunnel['public_url'][8:]))
+        if tunnel['proto'] == 'http':
+            DOMAIN = tunnel['public_url'][7:]
+        elif tunnel['proto'] == 'https':
+            DOMAIN = tunnel['public_url'][8:]
+    else:
+        logging.exception("GET request failed with status code {code}\nRequest:{req_str}".format(
+            code=responce.status_code, req_str="http://localhost:4041/api/tunnels"))
+        raise ConnectionError("Cannot connect to api")
+
+
+LOG_LEVEL = int(os.environ.get("LOG_LEVEL", default=0))
+DATA_UPLOAD = bool(os.environ.get("DEBUG", default=False))
+TOKEN = os.environ.get("API_TOKEN", default=None)
+CURRENT_WEEK = None
 
 logging.basicConfig(level=LOG_LEVEL)
-
-CURRENT_WEEK = None
 
 ALLOWED_HOSTS = [settings.DOMAIN, "0.0.0.0"]
 # Application definition
@@ -99,13 +115,13 @@ WSGI_APPLICATION = "baseapp.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'TempDB',
-        'USER': 'root',
-        'PASSWORD': 'e3Vz2Ukgp99',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
