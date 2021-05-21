@@ -4,6 +4,7 @@ from .authorised import keyboard
 
 @bot.callback_query_handler(lambda call: call.data == "c_login")
 def button_login(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
     callback_message = call.message
     try:
         chat_id = callback_message.chat.id

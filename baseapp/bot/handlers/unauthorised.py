@@ -99,6 +99,7 @@ def button_actions(chat):
 
 @bot.callback_query_handler(func=lambda call: call.data == "c_anonym")
 def anonym_handler(call):
+    logging.debug(f"Registered callback with callback data :{call.data}")
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     chat.state = State.NO_ACTIONS.value

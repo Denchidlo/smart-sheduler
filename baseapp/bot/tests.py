@@ -86,6 +86,3 @@ def reply_to_message_update_type(reply_to_message):
 
 def next_handler(message):
     message.text = 'entered next_handler'
-
-
-чё  

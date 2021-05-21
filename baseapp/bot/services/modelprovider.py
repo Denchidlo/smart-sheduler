@@ -1,3 +1,4 @@
+import logging
 from typing import Iterable
 from requests.models import HTTPError
 from ..dbmodels.employee import Employee
@@ -34,7 +35,7 @@ class ScheduleProvider:
         leng = len(employee_list)
         for employee in employee_list:
             idx += 1
-            print(f"Proceeded {idx}/{leng}")
+            logging.debug(f"Proceeded {idx}/{leng}")
             db_employee, _ = Employee.objects.get_or_create(
                 first_name=employee["firstName"],
                 last_name=employee["lastName"],
@@ -71,11 +72,9 @@ class ScheduleProvider:
         if bsuir_api_responce.status_code == 200:
             return bsuir_api_responce.json()
         else:
-            raise HTTPError(
-                "GET request failed with status code {code}\nRequest:{req_str}".format(
-                    code=bsuir_api_responce.status_code, req_str=request_string
-                )
-            )
+            logging.exception("GET request failed with status code {code}\nRequest:{req_str}".format(
+                    code=bsuir_api_responce.status_code, req_str=request_string))
+            raise HTTPError("")
 
 
 settings.CURRENT_WEEK = ScheduleProvider().make_request(

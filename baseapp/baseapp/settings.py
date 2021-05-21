@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import logging
 from pathlib import Path
 import json
+import os
 
 from django.conf import settings
 
@@ -29,6 +31,9 @@ AUTH_USER_MODEL = "bot.ScheduleUser"
 
 PROCEEDED = False
 
+# 'DJANGO_ALLOWED_HOSTS' должен быть в виде одной строки с хостами разделенными символом пробела
+# Для примера: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 
 with open(f"{BASE_DIR}/appsettings.json", "r") as reader:
@@ -37,6 +42,11 @@ with open(f"{BASE_DIR}/appsettings.json", "r") as reader:
     TOKEN = json_doc["api-token"]
     DOMAIN = json_doc["domain"]
     DATA_UPLOAD = json_doc["data-fetching"]
+    db_config = json_doc["database"]
+
+LOG_LEVEL = logging.NOTSET
+
+logging.basicConfig(level=LOG_LEVEL)
 
 CURRENT_WEEK = None
 
@@ -89,9 +99,13 @@ WSGI_APPLICATION = "baseapp.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'TempDB',
+        'USER': 'root',
+        'PASSWORD': 'e3Vz2Ukgp99',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 

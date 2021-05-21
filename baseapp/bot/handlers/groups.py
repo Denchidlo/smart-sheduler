@@ -99,6 +99,7 @@ def notify_group_input(chat, message_input):
     func=lambda call: re.match(r"^group=\d{6}\|cmd=[a-z]{4,10}$", call.data)
 )
 def group_action_handler(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     if chat.connected_user != None and chat.connected_user.group != None:
@@ -156,6 +157,7 @@ def group_action_handler(call: types.CallbackQuery):
     )
 )
 def group_requests_handler(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     preparsed_values = call.data.split("|")
@@ -207,6 +209,7 @@ def group_requests_handler(call: types.CallbackQuery):
     )
 )
 def user_request_desision(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     preparsed_values = call.data.split("|")
@@ -239,6 +242,7 @@ def user_request_desision(call: types.CallbackQuery):
     )
 )
 def user_request_desision_handler(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     preparsed_values = call.data.split("|")

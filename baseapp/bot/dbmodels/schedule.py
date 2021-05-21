@@ -74,7 +74,7 @@ class Lesson(models.Model):
     weekday = models.SmallIntegerField()
     weeks = models.IntegerField()
     subgroup = models.SmallIntegerField(default=0)
-    auditory = models.CharField(max_length=12, null=True, blank=True, default="unknown")
+    auditory = models.CharField(max_length=30, null=True, blank=True, default="unknown")
     lesson_time = models.CharField(max_length=11)
     lesson_start = models.TimeField()
     lesson_end = models.TimeField()
