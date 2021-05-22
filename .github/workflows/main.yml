@@ -18,6 +18,6 @@ jobs:
         name: publish
         uses: pennsignals/publish_docker-compose@v0.1.0
         with:
-          docker_compose: 'docker-compose.yml' # required
+          docker_compose: 'docker-compose.build.yml' # required
           repo_token: "${{ secrets.REPO_TOKEN }}"
           version: "webapp:v0.2"
