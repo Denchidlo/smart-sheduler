@@ -18,4 +18,4 @@ jobs:
       - name: Build the stack
         run: docker-compose up -d --build
       - name: Test
-        run: docker push -a
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/smart-schedule:latest
