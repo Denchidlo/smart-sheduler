@@ -36,35 +36,51 @@ AUTH_USER_MODEL = "bot.ScheduleUser"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = bool(os.environ.get("DEBUG", default=True))
-PRODUCTION_MODE = bool(os.environ.get("PROD_MODE", default=False))
+DOCKERIZED = bool(os.environ.get("DOCKERISED", default=False))
 
 
-if PRODUCTION_MODE:
-    DOMAIN = os.environ.get("DOMAIN", default=None)
-    LOG_FILE="bottrace.log"
-else:
-    time.sleep(5)
-    responce = req.get("http://localhost:4040/api/tunnels")
-    if responce.status_code == 200:
-        ngrok_responce = responce.json()
-        tunnel = ngrok_responce["tunnels"][0]
-        print('\n\tServer public domain: "{domain}"\n'.format(domain=tunnel['public_url'][8:]))
-        if tunnel['proto'] == 'http':
-            DOMAIN = tunnel['public_url'][7:]
-        elif tunnel['proto'] == 'https':
-            DOMAIN = tunnel['public_url'][8:]
+if DOCKERIZED:
+    DEBUG = bool(os.environ.get("DEBUG", default=True))
+    PRODUCTION_MODE = bool(os.environ.get("PROD_MODE", default=False))
+
+
+    if PRODUCTION_MODE:
+        DOMAIN = os.environ.get("DOMAIN", default=None)
+        LOG_FILE="bottrace.log"
     else:
-        logging.exception("GET request failed with status code {code}\nRequest:{req_str}".format(
-            code=responce.status_code, req_str="http://localhost:4041/api/tunnels"))
-        raise ConnectionError("Cannot connect to api")
+        LOG_FILE=None
+        time.sleep(5)
+        responce = req.get("http://localhost:4040/api/tunnels")
+        if responce.status_code == 200:
+            ngrok_responce = responce.json()
+            tunnel = ngrok_responce["tunnels"][0]
+            print('\n\tServer public domain: "{domain}"\n'.format(domain=tunnel['public_url'][8:]))
+            if tunnel['proto'] == 'http':
+                DOMAIN = tunnel['public_url'][7:]
+            elif tunnel['proto'] == 'https':
+                DOMAIN = tunnel['public_url'][8:]
+        else:
+            logging.exception("GET request failed with status code {code}\nRequest:{req_str}".format(
+                code=responce.status_code, req_str="http://localhost:4041/api/tunnels"))
+            raise ConnectionError("Cannot connect to api")
 
+
+    DATA_UPLOAD = bool(int(os.environ.get("DATA_UPLOAD", default=False)))
+    TOKEN = os.environ.get("API_TOKEN", default=None)
+    CURRENT_WEEK = None
+
+    logging.info(f"Config state:\n\tDATA_UPLOAD {DATA_UPLOAD}")
+
+else:
+    with open(f"{BASE_DIR}/appsettings.json", "r") as reader:
+        json_doc = json.load(reader)
+        DEBUG = json_doc["debug"]
+        TOKEN = json_doc["api-token"]
+        DOMAIN = json_doc["domain"]
+        DATA_UPLOAD = json_doc["data-fetching"]
+        LOG_FILE = None
 
 LOG_LEVEL = int(os.environ.get("LOG_LEVEL", default=0))
-DATA_UPLOAD = bool(os.environ.get("DEBUG", default=False))
-TOKEN = os.environ.get("API_TOKEN", default=None)
-CURRENT_WEEK = None
-
 
 logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 
@@ -118,12 +134,12 @@ WSGI_APPLICATION = "baseapp.wsgi.application"
 
 DATABASES = {
         "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
+        "NAME": os.environ.get("SQL_DATABASE", "TempDB"),
+        "USER": os.environ.get("SQL_USER", "root"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "e3Vz2Ukgp99"),
+        "HOST": os.environ.get("SQL_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("SQL_PORT", "3306"),
     }
 }
 

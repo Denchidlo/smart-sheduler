@@ -6,7 +6,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     network_mode: host
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=schedule
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_HOST=db
@@ -17,7 +17,7 @@ services:
       - ./baseapp/:/usr/src/baseapp/
     network_mode: host
     env_file:
-      - ./.env.dev
+      - ./.env
     depends_on:
       - db
   ngrok:

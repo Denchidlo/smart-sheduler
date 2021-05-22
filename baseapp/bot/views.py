@@ -1,3 +1,4 @@
+import logging
 from .dbmodels.validators import validate_username
 from .dbmodels.chat import Chat
 from .dbmodels.states import State, onstate
@@ -18,6 +19,7 @@ class BotResponcer(View):
     def post(self, request, *args, **kwargs):
         json_str = request.body.decode("UTF-8")
         update = types.Update.de_json(json_str)
+        logging.debug("NEW POST REQUEST")
         if self.update_id != update.update_id:
             bot.process_new_updates([update])
             self.update_id = update.update_id
