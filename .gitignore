@@ -4,9 +4,11 @@ __pycache__
 # Ignore telegram token
 *migrations*
 appsettings.json
+config.ini
 
 # Self-added folders
 dev-launch
+
 
 # Virtual enviroment
 telebot-env
