@@ -9,14 +9,15 @@ __author__ = "@schedulebase_bot"
 if settings.DEBUG:
     logger.setLevel(logging.DEBUG)  # Outputs debug messages to console.
 
-    if not settings.DATA_UPLOAD:
-        logging.debug(f"Created base user admin")
-        try:
-            ScheduleUser.objects.get(username="admin")
-        except:
-            ScheduleUser.objects.create_superuser(
-                "admin", "Чепуха", "Костлявая", "admin"
-            )
+    # if not settings.DATA_UPLOAD:
+    logging.debug(f"Created base user admin")
+    try:
+        ScheduleUser.objects.get(username="admin")
+    except:
+        ScheduleUser.objects.create_superuser(
+            "admin", "Чепуха", "Костлявая", "admin"
+        )
+        
 
 bot = AsyncTeleBot(settings.TOKEN)
 bot.threaded = True
@@ -24,7 +25,8 @@ bot.threaded = True
 bot.set_my_commands(
     [
         types.BotCommand("start", "Begin authentification"),
-        types.BotCommand("cancel", "Interrupt all actions, get to the stable state"),
+        types.BotCommand(
+            "cancel", "Interrupt all actions, get to the stable state"),
     ]
 )
 

@@ -1,5 +1,9 @@
 # Cache files and folders
 __pycache__
+.pytest_cache
+*.session
+*coverage*
+
 
 # Ignore telegram token
 *migrations*

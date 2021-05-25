@@ -6,6 +6,62 @@ from .common_objects import *
 from telebot import types
 
 
+@bot.callback_query_handler(
+    func=lambda call: re.match(r"^group=\d{6}\|cmd=[a-z]{4,10}$", call.data)
+)
+def group_action_handler(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
+    message: types.types.Message = call.message
+    chat = Chat.get_chat(message.chat.id)
+    if chat.connected_user != None and chat.connected_user.group != None:
+        preparsed_values = call.data.split("|")
+        group_requested = preparsed_values[0].split("=")[1]
+        if group_requested == chat.connected_user.group.name:
+            cmd = preparsed_values[1].split("=")[1]
+            group = chat.connected_user.group
+            if cmd == "info":
+                group_name = group.name
+                group_course = group.course
+                head_name = (
+                    group.grouplead.user.first_name
+                    if group.grouplead.user != None
+                    else "None"
+                )
+                bot.edit_message_text(
+                    f"Group number:{group_name}\nCourse:{group_course}\nGroup lead name:{head_name}",
+                    chat_id=chat.chat_id,
+                    message_id=message.message_id,
+                )
+            elif cmd == "stop":
+                bot.edit_message_text(
+                    "Closed",
+                    chat_id=chat.chat_id,
+                    message_id=message.message_id,
+                )
+                button_group(chat)
+            elif group.grouplead.user.id == chat.connected_user.id:
+                if cmd == "notify":
+                    bot.edit_message_text(
+                        f"Print your message:",
+                        chat_id=chat.chat_id,
+                        message_id=message.message_id,
+                    )
+                    chat.state = State.ON_ACTION_NOTIFY.value
+                    chat.save()
+        else:
+            bot.edit_message_text(
+                f"Oops, you came to far...\n\nMaybe you use irrelevant link",
+                chat_id=chat.chat_id,
+                message_id=message.message_id,
+            )
+    else:
+        bot.edit_message_text(
+            text=f"Oops, you came to far...\n\nJoin any group firstly",
+            chat_id=chat.chat_id,
+            message_id=message.message_id,
+        )
+
+
 def button_group(chat):
     try:
         chat_id = chat.chat_id
@@ -93,62 +149,6 @@ def notify_group_input(chat, message_input):
     chat.state = State.ON_ACTIONS.value
     chat.save()
     bot.send_message(chat.id, "Success!")
-
-
-@bot.callback_query_handler(
-    func=lambda call: re.match(r"^group=\d{6}\|cmd=[a-z]{4,10}$", call.data)
-)
-def group_action_handler(call: types.CallbackQuery):
-    logging.debug(f"Registered callback with callback data :{call.data}")
-    message: types.types.Message = call.message
-    chat = Chat.get_chat(message.chat.id)
-    if chat.connected_user != None and chat.connected_user.group != None:
-        preparsed_values = call.data.split("|")
-        group_requested = preparsed_values[0].split("=")[1]
-        if group_requested == chat.connected_user.group.name:
-            cmd = preparsed_values[1].split("=")[1]
-            group = chat.connected_user.group
-            if cmd == "info":
-                group_name = group.name
-                group_course = group.course
-                head_name = (
-                    group.grouplead.user.first_name
-                    if group.grouplead.user != None
-                    else "None"
-                )
-                bot.edit_message_text(
-                    f"Group number:{group_name}\nCourse:{group_course}\nGroup lead name:{head_name}",
-                    chat_id=chat.chat_id,
-                    message_id=message.message_id,
-                )
-            elif cmd == "stop":
-                bot.edit_message_text(
-                    "Closed",
-                    chat_id=chat.chat_id,
-                    message_id=message.message_id,
-                )
-                button_group(chat)
-            elif group.grouplead.user.id == chat.connected_user.id:
-                if cmd == "notify":
-                    bot.edit_message_text(
-                        f"Print your message:",
-                        chat_id=chat.chat_id,
-                        message_id=message.message_id,
-                    )
-                    chat.state = State.ON_ACTION_NOTIFY.value
-                    chat.save()
-        else:
-            bot.edit_message_text(
-                f"Oops, you came to far...\n\nMaybe you use irrelevant link",
-                chat_id=chat.chat_id,
-                message_id=message.message_id,
-            )
-    else:
-        bot.edit_message_text(
-            text=f"Oops, you came to far...\n\nJoin any group firstly",
-            chat_id=chat.chat_id,
-            message_id=message.message_id,
-        )
 
 
 @bot.callback_query_handler(
@@ -260,7 +260,7 @@ def user_request_desision_handler(call: types.CallbackQuery):
         responce_message = f"You declined {user.username}!"
     else:
         responce_message = "Something went wrong!"
-    bot.edit_message_text(
+    return bot.edit_message_text(
         responce_message,
         chat_id=chat.chat_id,
         message_id=message.message_id,

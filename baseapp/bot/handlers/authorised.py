@@ -23,53 +23,45 @@ handled_states = [
     and onstate(message.chat.id, handled_states),
 )
 def authorised_actions_handler(message: types.Message):
+    result = None
     chat_id = message.chat.id
     chat = Chat.get_chat(chat_id)
     state = chat.state
     request = message.text
     if state == State.NO_ACTIONS.value:
         if request == "Actions 📋":
-            button_actions(chat)
-            return
-        if request == "Logout 🚶‍♂️":
-            button_logout(chat)
-            return
-        keyboard(chat)
-        return
+            result = button_actions(chat)
+        elif request == "Logout 🚶‍♂️":
+            result = button_logout(chat)
+        else:
+            result = keyboard(chat)
     elif state == State.ON_ACTIONS.value:
         if request == "Get schedule":
-            button_get_schedule(chat)
-            return
+            result = button_get_schedule(chat)
         elif request == "Group":
-            button_group(chat)
-            return
+            result = button_group(chat)
         elif request == "Request group membership":
             button_request_membership(chat)
-            return
         elif request == "Back to keyboard":
-            button_back_to_keyboard(chat)
-            return
-        button_actions(chat)
-        bot.reply_to(message, "Oops, i don't know what to do with it!")
-        return
+            result = button_back_to_keyboard(chat)
+        else:
+            button_actions(chat)
+            result = bot.reply_to(message, "Oops, i don't know what to do with it!")
     elif state == State.ON_ACTION_SCHEDULE_GROUP_ENTER.value:
-        schedule_group_input(chat, request)
-        return
+        result = schedule_group_input(chat, request)
     elif state == State.ON_ACTION_NOTIFY.value:
-        notify_group_input(chat, request)
-        return
+        result = notify_group_input(chat, request)
     elif state == State.ON_GROUP_REQUEST_NAME.value:
-        request_group_input(chat, request)
-        return
+        result = request_group_input(chat, request)
     else:
-        keyboard(chat)
-        bot.reply_to(message, "Oops, i don't know what to do with it!")
+        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
+    return result
 
 
 def keyboard(chat):
     user = chat.connected_user
     if user != None:
-        bot.send_message(
+        return bot.send_message(
             chat.chat_id,
             text="What do you want, {username}".format(username=user.first_name),
             reply_markup=AUTHORISED_KB_MARKUP,
@@ -84,7 +76,7 @@ def button_logout(chat):
     chat.connected_user = None
     chat.authorised = False
     chat.save()
-    bot.send_message(
+    return bot.send_message(
         chat_id, "You successfuly logged out\nPrint command /start to use bot"
     )
 
@@ -101,11 +93,11 @@ def button_actions(chat):
     back_to_action = types.KeyboardButton("Back to keyboard")
     markup.add(get_schedule)
     markup.add(group_actions, back_to_action)
-    bot.send_message(chat_id, "Actions:", reply_markup=markup)
     chat.save()
+    return bot.send_message(chat_id, "Actions:", reply_markup=markup)
 
 
 def button_back_to_keyboard(chat):
     chat.state = State.NO_ACTIONS.value
     chat.save()
-    keyboard(chat)
+    return keyboard(chat)
