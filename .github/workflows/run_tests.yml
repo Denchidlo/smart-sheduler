@@ -21,7 +21,7 @@ jobs:
      run: pip install -r baseapp/requirements.txt
    - 
      name: asd
-     run: pytest --cov=bot /baseapp > coverage.report
+     run: pytest --cov=bot baseapp > coverage.report
    - 
      name: show info
      run: echo coverage.report && rm coverage.report 
