@@ -10,17 +10,18 @@ jobs:
  run_tests:
    runs-on: [ubuntu-latest]
    steps:
-  # Чекаутим код
- - uses: actions/checkout@master
+   - uses: actions/checkout@master
    # Устанавливаем python нужной версии
- - uses: actions/setup-python@v1
-   with:
-     python-version: '3.8'
-     architecture: 'x64'
- - name: Install requirements
-   # Устанавливаем зависимости
-   run: pip install -r baseapp/requirements.txt
- - name: Run tests
-   run: pytest --cov=bot /baseapp > coverage.report
- - name: Tests report
-   run: echo coverage.report && rm coverage.report 
+   - uses: actions/setup-python@v1
+     with:
+       python-version: '3.8'
+       architecture: 'x64'
+   - 
+     name: install requirements
+     run: pip install -r baseapp/requirements.txt
+   - 
+     name: asd
+     run: pytest --cov=bot /baseapp > coverage.report
+   - 
+     name: show info
+     run: echo coverage.report && rm coverage.report 
