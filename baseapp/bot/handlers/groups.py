@@ -133,8 +133,9 @@ def notify_group_input(chat, message_input):
         and chat.connected_user.group.grouplead.user != None
         and chat.connected_user.group.grouplead.user.id == chat.connected_user.id
     ):
-        chat_list = chat.get_chatlist(chat.connected_user.group)
-        for chat_id in chat_list:
+        chat_list = set(chat.get_chatlist(chat.connected_user.group))
+        # user_connected_chatlist = set([el.chat_id for el in chat.connected_user.chat_set])
+        for chat_id in chat_list :
             try:
                 bot.send_message(
                     chat_id,
@@ -188,7 +189,10 @@ def group_requests_handler(call: types.CallbackQuery):
         button_cancel = types.InlineKeyboardButton(
             "❌", callback_data=f"group={group.name}|cmd=stop"
         )
-        markup.row(button_prev, button_cancel, button_next)
+        if page > 5:
+            markup.row(button_prev, button_cancel, button_next)
+        else:
+            markup.row(button_cancel)
         bot.edit_message_text(
             text=f"Requsts in {group.name}:",
             chat_id=chat.chat_id,

@@ -253,8 +253,31 @@ class TestSignupHandlers:
         assert model_chat.connected_user.check_password(password)
         assert model_chat.state == State.SIGNING_IN_CONFIRM_PASS.value
         
-    def test_singup_input_pass_handler():
-        pass
+    def test_singup_confirm_pass_handler(db, telegram_message, model_user, model_chat):
+        password = "123ivanovvitya"
+        telegram_message.text = password
+        model_user.set_password("123VSvanovvitya#")
+        model_user.save()
+        model_chat.connected_user = model_user
+        model_chat.state = State.SIGNING_IN_CONFIRM_PASS.value
+        model_chat.save()
+        handler = process_message(telegram_message)
+        model_chat = Chat.get_chat(model_chat.chat_id)
+        assert handler == signin_password_input
+        assert model_chat.connected_user != None and model_chat.authorised == False
+        assert model_chat.state == State.SIGNING_IN_CONFIRM_PASS.value
+
+        # Everything is ok
+        password = "123VSvanovvitya#"
+        telegram_message.text = password
+        model_chat.connected_user = model_user
+        model_chat.state = State.SIGNING_IN_CONFIRM_PASS.value
+        model_chat.save()
+        handler = process_message(telegram_message)
+        model_chat = Chat.get_chat(model_chat.chat_id)
+        assert handler == signin_password_input
+        assert model_chat.connected_user != None and model_chat.authorised == True
+        assert model_chat.state == State.NO_ACTIONS.value
 
 
 class TestCallback: 

@@ -25,7 +25,7 @@ class BotResponcer(View):  # pragma: no cover
             bot.process_new_updates([update])
             self.update_id = update.update_id
 
-        return HttpResponse("")
+        return HttpResponse("OK")
 
 
 @bot.message_handler(commands=["start"])

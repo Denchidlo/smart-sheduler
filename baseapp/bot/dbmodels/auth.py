@@ -62,6 +62,10 @@ class ScheduleUser(AbstractBaseUser):
         )
         return req_users[5 * page : 5 * (page + 1)], len(req_users)
 
+    def get_members(self, group, page):
+        members = ScheduleUser.objects.filter(group=group)
+        return members[5 * page : 5 * (page + 1)], len(members)
+
 
 class GroupLead(models.Model):
     group = models.OneToOneField(StudentGroup, unique=True, on_delete=models.CASCADE)

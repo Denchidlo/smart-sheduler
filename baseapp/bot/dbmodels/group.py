@@ -15,19 +15,6 @@ class StudentGroup(models.Model):
     name = models.CharField(max_length=7, unique=True)
     course = models.SmallIntegerField(default=None, null=True)
 
-    def add_user(self, user):
-        if self.head == None:
-            self.set_admin(user)
-        else:
-            user.group = self
-            user.save()
-
-    def set_admin(self, user):
-        user.group = self
-        user.save()
-        self.head = user
-        self.save()
-
     def get_schedule(self, day, week: int):
         lessons = (
             self.lesson_set.select_related()
