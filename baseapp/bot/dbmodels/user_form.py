@@ -5,7 +5,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
 
-class UserCreationForm(forms.ModelForm):
+class UserCreationForm(forms.ModelForm):  # pragma: no cover
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
 
@@ -35,7 +35,7 @@ class UserCreationForm(forms.ModelForm):
         return user
 
 
-class UserChangeForm(forms.ModelForm):
+class UserChangeForm(forms.ModelForm):  # pragma: no cover
     """A form for updating users. Includes all the fields on
     the user, but replaces the password field with admin's
     disabled password hash display field.
@@ -55,7 +55,7 @@ class UserChangeForm(forms.ModelForm):
         )
 
 
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin):  # pragma: no cover
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm

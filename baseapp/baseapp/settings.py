@@ -43,27 +43,33 @@ if DOCKERIZED:
     DEBUG = bool(os.environ.get("DEBUG", default=True))
     PRODUCTION_MODE = bool(os.environ.get("PROD_MODE", default=False))
 
-
     if PRODUCTION_MODE:
         DOMAIN = os.environ.get("DOMAIN", default=None)
-        LOG_FILE="bottrace.log"
+        LOG_FILE = "bottrace.log"
     else:
-        LOG_FILE=None
+        LOG_FILE = None
         time.sleep(5)
         responce = req.get("http://localhost:4040/api/tunnels")
         if responce.status_code == 200:
             ngrok_responce = responce.json()
             tunnel = ngrok_responce["tunnels"][0]
-            print('\n\tServer public domain: "{domain}"\n'.format(domain=tunnel['public_url'][8:]))
-            if tunnel['proto'] == 'http':
-                DOMAIN = tunnel['public_url'][7:]
-            elif tunnel['proto'] == 'https':
-                DOMAIN = tunnel['public_url'][8:]
+            print(
+                '\n\tServer public domain: "{domain}"\n'.format(
+                    domain=tunnel["public_url"][8:]
+                )
+            )
+            if tunnel["proto"] == "http":
+                DOMAIN = tunnel["public_url"][7:]
+            elif tunnel["proto"] == "https":
+                DOMAIN = tunnel["public_url"][8:]
         else:
-            logging.exception("GET request failed with status code {code}\nRequest:{req_str}".format(
-                code=responce.status_code, req_str="http://localhost:4041/api/tunnels"))
+            logging.exception(
+                "GET request failed with status code {code}\nRequest:{req_str}".format(
+                    code=responce.status_code,
+                    req_str="http://localhost:4041/api/tunnels",
+                )
+            )
             raise ConnectionError("Cannot connect to api")
-
 
     DATA_UPLOAD = bool(int(os.environ.get("DATA_UPLOAD", default=False)))
     TOKEN = os.environ.get("API_TOKEN", default=None)
@@ -133,7 +139,7 @@ WSGI_APPLICATION = "baseapp.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-        "default": {
+    "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
         "NAME": os.environ.get("SQL_DATABASE", "TempDB"),
         "USER": os.environ.get("SQL_USER", "root"),

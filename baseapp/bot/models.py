@@ -5,3 +5,4 @@ from .dbmodels.employee import Employee
 from .dbmodels.schedule import Lesson
 from .dbmodels.group import StudentGroup
 from .dbmodels.user_form import UserAdmin
+from .dbmodels.states import State

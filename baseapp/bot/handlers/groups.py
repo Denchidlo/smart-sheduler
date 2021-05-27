@@ -253,13 +253,11 @@ def user_request_desision_handler(call: types.CallbackQuery):
         user.is_member = True
         user.save()
         responce_message = f"You accepted {user.username}!"
-    elif decision == "decline":
+    else:
         user.is_member = False
         user.group = None
         user.save()
         responce_message = f"You declined {user.username}!"
-    else:
-        responce_message = "Something went wrong!"
     return bot.edit_message_text(
         responce_message,
         chat_id=chat.chat_id,

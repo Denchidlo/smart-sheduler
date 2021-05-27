@@ -32,15 +32,3 @@ def authorized(chat_id: Chat) -> bool:
         return Chat.objects.get(chat_id=chat_id).authorised
     except:
         return False
-
-
-def group_member(chat_id: Chat) -> bool:
-    try:
-        chat = Chat.objects.get(chat_id=chat_id)
-        user = chat.connected_user
-        if user != None:
-            if user.group != None:
-                return True
-        return False
-    except:
-        return False

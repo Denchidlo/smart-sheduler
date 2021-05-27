@@ -15,7 +15,6 @@ admin.site.register(GroupLead)
 admin.site.register(Lesson)
 admin.site.register(StudentGroup)
 
-if settings.DATA_UPLOAD and os.environ.get('RUN_MAIN') == 'true':
-        temp_thread = Thread(target=ScheduleProvider().load, daemon=True)
-        temp_thread.start()
-
+if settings.DATA_UPLOAD and os.environ.get("RUN_MAIN") == "true":  # pragma: no cover
+    temp_thread = Thread(target=ScheduleProvider().load, daemon=True)
+    temp_thread.start()

@@ -1,3 +1,4 @@
+from .handlers import authorised, unauthorised, login, signin, groups, schedule
 import logging
 from .dbmodels.validators import validate_username
 from .dbmodels.chat import Chat
@@ -9,7 +10,7 @@ from django.views import View
 from telebot import types
 
 
-class BotResponcer(View):
+class BotResponcer(View):  # pragma: no cover
     def __init__(self):
         self.update_id = None
 
@@ -25,9 +26,6 @@ class BotResponcer(View):
             self.update_id = update.update_id
 
         return HttpResponse("")
-
-
-# Set some views
 
 
 @bot.message_handler(commands=["start"])
@@ -90,9 +88,6 @@ def cmd_cancel_handler(message):
     chat.save()
 
 
-from .handlers import login, signin, authorised, unauthorised, groups, schedule
-
-
 @bot.message_handler(
     func=lambda message: True,
     content_types=[
@@ -108,4 +103,28 @@ from .handlers import login, signin, authorised, unauthorised, groups, schedule
     ],
 )
 def default_handler(message):
-    bot.reply_to(message, "I have no idea what is it...")
+    return bot.reply_to(message, "I have no idea what is it...")
+
+
+@bot.edited_message_handler(
+    func=lambda message: True,
+    content_types=[
+        "audio",
+        "photo",
+        "voice",
+        "video",
+        "document",
+        "text",
+        "location",
+        "contact",
+        "sticker",
+    ],
+)
+def default_editmessage_handler(message):
+    return bot.reply_to(message, "I do not handle edited messages")
+
+
+bot.message_handlers.reverse()
+tmp_hnd = bot.message_handlers[0]
+bot.message_handlers.remove(bot.message_handlers[0])
+bot.message_handlers.append(tmp_hnd)
