@@ -1,4 +1,4 @@
-from .handlers import authorised, unauthorised, login, signin, groups, schedule
+from .handlers import authorised, unauthorised, login, signin, groups, schedule, account
 import logging
 from .dbmodels.validators import validate_username
 from .dbmodels.chat import Chat

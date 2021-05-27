@@ -2,11 +2,13 @@
 __pycache__
 .pytest_cache
 *.session
+*.sql
 *coverage*
 
+# Ignore migrations 
+[0-9][0-9][0-9][0-9]_*.py
 
 # Ignore telegram token
-*migrations*
 appsettings.json
 config.ini
 

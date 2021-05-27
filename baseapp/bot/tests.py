@@ -12,8 +12,7 @@ RESPONCE_TG_ID = 0
 
 
 def fetch_handler(name):
-    el = next(
-        filter(lambda el: el["function"].__name__ == name, bot.message_handlers))
+    el = next(filter(lambda el: el["function"].__name__ == name, bot.message_handlers))
     return el
 
 
@@ -70,7 +69,7 @@ def telegram_user(db) -> types.User:
 
 
 @pytest.fixture(scope="function")
-def telegram_message(db, telegram_user, telegram_chat) -> types.Message: 
+def telegram_message(db, telegram_user, telegram_chat) -> types.Message:
     return types.Message(123123, telegram_user, 1, telegram_chat, "text", [], "null")
 
 
@@ -131,7 +130,9 @@ class TestViewHandlers:
 
 
 class TestSignupHandlers:
-    def test_signup_input_username_handler(db, telegram_message, model_user, model_chat):
+    def test_signup_input_username_handler(
+        db, telegram_message, model_user, model_chat
+    ):
         # Invalid username
         telegram_message.text = "username@!#!@()!!!112123 sdas"
         model_chat.state = State.SIGNING_IN_UNAME.value
@@ -252,7 +253,7 @@ class TestSignupHandlers:
         assert model_chat.connected_user != None and model_chat.authorised == False
         assert model_chat.connected_user.check_password(password)
         assert model_chat.state == State.SIGNING_IN_CONFIRM_PASS.value
-        
+
     def test_singup_confirm_pass_handler(db, telegram_message, model_user, model_chat):
         password = "123ivanovvitya"
         telegram_message.text = password
@@ -280,6 +281,6 @@ class TestSignupHandlers:
         assert model_chat.state == State.NO_ACTIONS.value
 
 
-class TestCallback: 
+class TestCallback:
     def test_callback(db):
         assert 0

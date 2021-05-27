@@ -2,8 +2,37 @@ from datetime import datetime
 from django.conf import settings
 from django.db.models.query import FlatValuesListIterable
 from telebot.apihelper import ApiTelegramException
+from .schedule import schedule_group_input
 from .common_objects import *
 from telebot import types
+
+group_handled_states = [
+    State.ON_GROUP_REQUEST_NAME,
+    State.ON_ACTION_SCHEDULE_GROUP_ENTER,
+    State.ON_ACTION_NOTIFY,
+]
+
+
+@bot.message_handler(
+    content_types=["text"],
+    func=lambda message: authorized(message.chat.id)
+    and onstate(message.chat.id, group_handled_states),
+)
+def group_actions_handler(message: types.Message):
+    result = None
+    chat_id = message.chat.id
+    chat = Chat.get_chat(chat_id)
+    state = chat.state
+    request = message.text
+    if state == State.ON_ACTION_SCHEDULE_GROUP_ENTER.value:
+        result = schedule_group_input(chat, request)
+    elif state == State.ON_ACTION_NOTIFY.value:
+        result = notify_group_input(chat, request)
+    elif state == State.ON_GROUP_REQUEST_NAME.value:
+        result = request_group_input(chat, request)
+    else:
+        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
+    return result
 
 
 @bot.callback_query_handler(
@@ -135,7 +164,7 @@ def notify_group_input(chat, message_input):
     ):
         chat_list = set(chat.get_chatlist(chat.connected_user.group))
         # user_connected_chatlist = set([el.chat_id for el in chat.connected_user.chat_set])
-        for chat_id in chat_list :
+        for chat_id in chat_list:
             try:
                 bot.send_message(
                     chat_id,

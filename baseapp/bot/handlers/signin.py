@@ -40,7 +40,7 @@ def signin_data_input(message):
             )
             if not created:
                 responce_message = (
-                    "Username alreasy exsist!\n\nTry to make unique username:"
+                    "Username alreasy exsist!\nTry to make unique username:"
                 )
             else:
                 responce_message = "Set first name"
@@ -48,7 +48,7 @@ def signin_data_input(message):
                 chat.state = State.SIGNING_IN_FNAME.value
         else:
             responce_message = (
-                "Username shuold contain from 5 to 30 letters/digits\n\nTry again:"
+                "Username shuold contain from 5 to 30 letters/digits\nTry again:"
             )
     elif validate_name(message_input):
         if chat.state == State.SIGNING_IN_FNAME.value:
@@ -61,7 +61,7 @@ def signin_data_input(message):
             chat.state = State.SIGNING_IN_PASS.value
         chat.connected_user.save()
     else:
-        responce_message = "Name and lastname should be from 5 to 30 and consist of letters\n\nTry again:"
+        responce_message = "First name and last name should be from 5 to 30 and consist of letters\nTry again:"
     chat.save()
     bot.send_message(chat_id, responce_message, reply_markup=CANCEL_MARKUP)
 
@@ -91,16 +91,9 @@ def signin_password_input(message):
             chat.state = State.NO_ACTIONS.value
             keyboard(chat)
         else:
-            responce_message = "Wrong password!\n\nTry again:"
+            responce_message = "Wrong password!\nTry again:"
     else:
-        responce_message = """Conditions for a valid password are: 🔒
-
-    Should have at least one number.
-    Should have at least one uppercase and one lowercase character.
-    Should have at least one special symbol (In most case just add one #).
-    Should be between 6 to 20 characters long.
-    
-    Try again:"""
+        responce_message = PASSWORD_VALIDATION_MESSAGE
     chat.save()
     bot.send_message(
         chat_id,
