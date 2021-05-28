@@ -11,7 +11,9 @@ class Chat(models.Model):
         default=None,
         on_delete=models.SET_DEFAULT,
     )
-    telegram_username = models.CharField(max_length=50, default=None, null=True, blank=True)
+    telegram_username = models.CharField(
+        max_length=50, default=None, null=True, blank=True
+    )
     state = models.PositiveBigIntegerField()
     authorised = models.BooleanField(default=False)
 

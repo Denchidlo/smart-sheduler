@@ -31,25 +31,25 @@ def group_actions_handler(message: types.Message):
     elif state == State.ON_GROUP_REQUEST_NAME.value:
         result = request_group_input(chat, request)
     else:
-        result = bot.reply_to(
-            message, "Oops, i don't know what to do with it!")
+        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
     return result
 
+
 @bot.callback_query_handler(
-    func=lambda call: re.fullmatch(r"^group=\d{6}\|cmd=info\|page=[0-9]{1,12}$", call.data)
+    func=lambda call: re.fullmatch(
+        r"^group=\d{6}\|cmd=info\|page=[0-9]{1,12}$", call.data
+    )
 )
 def group_user_list_creator(call: types.CallbackQuery):
     logging.debug(f"Registered callback with callback data :{call.data}")
-    page = int(call.data.split('|')[2].split('=')[1])
+    page = int(call.data.split("|")[2].split("=")[1])
     message: types.types.Message = call.message
     chat = Chat.get_chat(message.chat.id)
     group = chat.connected_user.group
     group_name = group.name
     group_course = group.course
     head_name = (
-        group.grouplead.user.first_name
-        if group.grouplead.user != None
-        else "None"
+        group.grouplead.user.first_name if group.grouplead.user != None else "None"
     )
     markup = types.InlineKeyboardMarkup(row_width=1)
     users, size = chat.connected_user.get_members(group, page)
@@ -68,7 +68,7 @@ def group_user_list_creator(call: types.CallbackQuery):
         "prev", callback_data=f"group={group.name}|cmd=info|page={prev_page}"
     )
     button_cancel = types.InlineKeyboardButton(
-            "❌", callback_data=f"group={group.name}|cmd=stop"
+        "❌", callback_data=f"group={group.name}|cmd=stop"
     )
     if page > 4:
         markup.row(button_prev, button_cancel, button_next)
@@ -78,7 +78,7 @@ def group_user_list_creator(call: types.CallbackQuery):
         f"Group number:{group_name}\nCourse:{group_course}\nGroup lead name:{head_name}",
         chat_id=chat.chat_id,
         message_id=message.message_id,
-        reply_markup=markup
+        reply_markup=markup,
     )
 
 
@@ -145,9 +145,7 @@ def button_group(chat):
             "Requests",
             callback_data=f"group={group.name}|cmd=membership|page=0",
         )
-        markup.add(
-            group_info, group_schedule, notify_all_button, membership_requests
-        )
+        markup.add(group_info, group_schedule, notify_all_button, membership_requests)
     else:
         markup.add(group_info, group_schedule)
     bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
@@ -195,7 +193,11 @@ def notify_group_input(chat, message_input):
     ):
         chat_list = set(chat.get_chatlist(chat.connected_user.group))
         user_connected_chatlist = set(
-            [el.chat_id for el in Chat.objects.filter(connected_user=chat.connected_user)])
+            [
+                el.chat_id
+                for el in Chat.objects.filter(connected_user=chat.connected_user)
+            ]
+        )
         for chat_id in chat_list - user_connected_chatlist:
             try:
                 bot.send_message(
@@ -332,7 +334,8 @@ def user_request_desision_handler(call: types.CallbackQuery):
 
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
-        r"group=\d{6}\|cmd=user_info\|id=[0-9]{1,12}\|return_page=[0-9]{1,12}$", call.data
+        r"group=\d{6}\|cmd=user_info\|id=[0-9]{1,12}\|return_page=[0-9]{1,12}$",
+        call.data,
     )
 )
 def user_info_handler(call: types.CallbackQuery):
@@ -346,13 +349,20 @@ def user_info_handler(call: types.CallbackQuery):
     user = ScheduleUser.objects.get(id=user_id)
     markup = types.InlineKeyboardMarkup(row_width=1)
     button_cancel = types.InlineKeyboardButton(
-            "❌", callback_data=f"group={group.name}|cmd=info|page={return_page}"
+        "❌", callback_data=f"group={group.name}|cmd=info|page={return_page}"
     )
     markup.row(button_cancel)
-    response_message = "User info:\nusername: {username}\nfull name: {first_name} {last_name}\nPossible telegram usernames:\n@{usernames}".format(username=user.username, first_name=user.first_name, last_name=user.last_name, usernames='\n@'.join([el.telegram_username for el in Chat.objects.filter(connected_user=user)]))
+    response_message = "User info:\nusername: {username}\nfull name: {first_name} {last_name}\nPossible telegram usernames:\n@{usernames}".format(
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        usernames="\n@".join(
+            [el.telegram_username for el in Chat.objects.filter(connected_user=user)]
+        ),
+    )
     return bot.edit_message_text(
         response_message,
         chat_id=chat.chat_id,
         message_id=message.message_id,
-        reply_markup=markup
+        reply_markup=markup,
     )
