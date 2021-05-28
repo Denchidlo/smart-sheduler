@@ -33,7 +33,7 @@ def cmd_start_handler(message: types.Message):
     chat_id = message.chat.id
     current_chat, created = Chat.objects.get_or_create(
         chat_id=chat_id,
-        defaults={"connected_user": None, "state": State.CHAT_STARTED.value},
+        defaults={"connected_user": None, "state": State.CHAT_STARTED.value, "telegram_username":message.from_user.username},
     )
     if created:
         bot.send_message(

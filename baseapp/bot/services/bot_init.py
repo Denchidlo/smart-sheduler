@@ -7,7 +7,7 @@ import logging
 __author__ = "@schedulebase_bot"
 
 if settings.DEBUG:  # pragma: no cover
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(settings.LOG_LEVEL)
 
     # if not settings.DATA_UPLOAD:
     logging.debug(f"Created base user admin")

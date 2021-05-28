@@ -115,7 +115,6 @@ def lesson_info(call):
     preparsed_values = call.data.split("|")
     lesson_id = int(preparsed_values[0].split("=")[1])
     call_data = call.data.split("(")[1].split(")")[0]
-    print(call_data)
     lesson = Lesson.objects.get(id=lesson_id)
     responce_message = f"Subject:{lesson.subject}\nAuditory:{lesson.auditory[1:-1]}\nDuration:{lesson.lesson_time}\nEmployee: {lesson.employee.fio}"
     markup = types.InlineKeyboardMarkup()

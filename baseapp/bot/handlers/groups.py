@@ -31,12 +31,59 @@ def group_actions_handler(message: types.Message):
     elif state == State.ON_GROUP_REQUEST_NAME.value:
         result = request_group_input(chat, request)
     else:
-        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
+        result = bot.reply_to(
+            message, "Oops, i don't know what to do with it!")
     return result
+
+@bot.callback_query_handler(
+    func=lambda call: re.fullmatch(r"^group=\d{6}\|cmd=info\|page=[0-9]{1,12}$", call.data)
+)
+def group_user_list_creator(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
+    page = int(call.data.split('|')[2].split('=')[1])
+    message: types.types.Message = call.message
+    chat = Chat.get_chat(message.chat.id)
+    group = chat.connected_user.group
+    group_name = group.name
+    group_course = group.course
+    head_name = (
+        group.grouplead.user.first_name
+        if group.grouplead.user != None
+        else "None"
+    )
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    users, size = chat.connected_user.get_members(group, page)
+    for el in users:
+        user_link = types.InlineKeyboardButton(
+            f"{el.username} | {el.first_name} {el.last_name}",
+            callback_data=f"group={group.name}|cmd=user_info|id={el.id}|return_page={page}",
+        )
+        markup.row(user_link)
+    next_page = page + 1 if (4 * (page + 1) < size) else page
+    prev_page = page - 1 if page != 0 else page
+    button_next = types.InlineKeyboardButton(
+        "next", callback_data=f"group={group.name}|cmd=info|page={next_page}"
+    )
+    button_prev = types.InlineKeyboardButton(
+        "prev", callback_data=f"group={group.name}|cmd=info|page={prev_page}"
+    )
+    button_cancel = types.InlineKeyboardButton(
+            "❌", callback_data=f"group={group.name}|cmd=stop"
+    )
+    if page > 4:
+        markup.row(button_prev, button_cancel, button_next)
+    else:
+        markup.row(button_cancel)
+    bot.edit_message_text(
+        f"Group number:{group_name}\nCourse:{group_course}\nGroup lead name:{head_name}",
+        chat_id=chat.chat_id,
+        message_id=message.message_id,
+        reply_markup=markup
+    )
 
 
 @bot.callback_query_handler(
-    func=lambda call: re.match(r"^group=\d{6}\|cmd=[a-z]{4,10}$", call.data)
+    func=lambda call: re.fullmatch(r"^group=\d{6}\|cmd=[a-z]{4,10}$", call.data)
 )
 def group_action_handler(call: types.CallbackQuery):
     logging.debug(f"Registered callback with callback data :{call.data}")
@@ -48,20 +95,7 @@ def group_action_handler(call: types.CallbackQuery):
         if group_requested == chat.connected_user.group.name:
             cmd = preparsed_values[1].split("=")[1]
             group = chat.connected_user.group
-            if cmd == "info":
-                group_name = group.name
-                group_course = group.course
-                head_name = (
-                    group.grouplead.user.first_name
-                    if group.grouplead.user != None
-                    else "None"
-                )
-                bot.edit_message_text(
-                    f"Group number:{group_name}\nCourse:{group_course}\nGroup lead name:{head_name}",
-                    chat_id=chat.chat_id,
-                    message_id=message.message_id,
-                )
-            elif cmd == "stop":
+            if cmd == "stop":
                 bot.edit_message_text(
                     "Closed",
                     chat_id=chat.chat_id,
@@ -92,34 +126,31 @@ def group_action_handler(call: types.CallbackQuery):
 
 
 def button_group(chat):
-    try:
-        chat_id = chat.chat_id
-        group = chat.connected_user.group
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        group_info = types.InlineKeyboardButton(
-            "Group info", callback_data=f"group={group.name}|cmd=info"
+    chat_id = chat.chat_id
+    group = chat.connected_user.group
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    group_info = types.InlineKeyboardButton(
+        "Group info", callback_data=f"group={group.name}|cmd=info|page=0"
+    )
+    day = datetime.now().weekday() + 1
+    group_schedule = types.InlineKeyboardButton(
+        "Group schedule",
+        callback_data=f"group={group.name}|day={day}|week={settings.CURRENT_WEEK}",
+    )
+    if group.grouplead.user.id == chat.connected_user.id:
+        notify_all_button = types.InlineKeyboardButton(
+            "Notify group", callback_data=f"group={group.name}|cmd=notify"
         )
-        day = datetime.now().weekday() + 1
-        group_schedule = types.InlineKeyboardButton(
-            "Group schedule",
-            callback_data=f"group={group.name}|day={day}|week={settings.CURRENT_WEEK}",
+        membership_requests = types.InlineKeyboardButton(
+            "Requests",
+            callback_data=f"group={group.name}|cmd=membership|page=0",
         )
-        if group.grouplead.user.id == chat.connected_user.id:
-            notify_all_button = types.InlineKeyboardButton(
-                "Notify group", callback_data=f"group={group.name}|cmd=notify"
-            )
-            membership_requests = types.InlineKeyboardButton(
-                "Requests",
-                callback_data=f"group={group.name}|cmd=membership|page=0",
-            )
-            markup.add(
-                group_info, group_schedule, notify_all_button, membership_requests
-            )
-        else:
-            markup.add(group_info, group_schedule)
-        bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
-    except:
-        pass
+        markup.add(
+            group_info, group_schedule, notify_all_button, membership_requests
+        )
+    else:
+        markup.add(group_info, group_schedule)
+    bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
 
 
 def button_request_membership(chat):
@@ -163,8 +194,9 @@ def notify_group_input(chat, message_input):
         and chat.connected_user.group.grouplead.user.id == chat.connected_user.id
     ):
         chat_list = set(chat.get_chatlist(chat.connected_user.group))
-        # user_connected_chatlist = set([el.chat_id for el in chat.connected_user.chat_set])
-        for chat_id in chat_list:
+        user_connected_chatlist = set(
+            [el.chat_id for el in Chat.objects.filter(connected_user=chat.connected_user)])
+        for chat_id in chat_list - user_connected_chatlist:
             try:
                 bot.send_message(
                     chat_id,
@@ -178,12 +210,12 @@ def notify_group_input(chat, message_input):
                 chat.save()
     chat.state = State.ON_ACTIONS.value
     chat.save()
-    bot.send_message(chat.id, "Success!")
+    bot.send_message(chat.chat_id, "Success!")
 
 
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
-        r"group=\d{6}\|cmd=membership\|page=[0-9]$", call.data
+        r"group=\d{6}\|cmd=membership\|page=[0-9]{1,12}$", call.data
     )
 )
 def group_requests_handler(call: types.CallbackQuery):
@@ -207,7 +239,7 @@ def group_requests_handler(call: types.CallbackQuery):
                 callback_data=f"group={group.name}|cmd=user_action|id={el.id}",
             )
             markup.row(user_link)
-        next_page = page + 1 if (5 * (page + 1) < size) else page
+        next_page = page + 1 if (4 * (page + 1) < size) else page
         prev_page = page - 1 if page != 0 else page
         button_next = types.InlineKeyboardButton(
             "next", callback_data=f"group={group.name}|cmd=membership|page={next_page}"
@@ -218,7 +250,7 @@ def group_requests_handler(call: types.CallbackQuery):
         button_cancel = types.InlineKeyboardButton(
             "❌", callback_data=f"group={group.name}|cmd=stop"
         )
-        if page > 5:
+        if page > 4:
             markup.row(button_prev, button_cancel, button_next)
         else:
             markup.row(button_cancel)
@@ -250,7 +282,7 @@ def user_request_desision(call: types.CallbackQuery):
     user = ScheduleUser.objects.get(id=user_id)
     user_name = user.username
     user_fl = user.first_name + " " + user.last_name
-    responce_message = f"Username:{user_name}\nInfo:{user_fl}"
+    response_message = f"Username:{user_name}\nInfo:{user_fl}"
     markup = types.InlineKeyboardMarkup(row_width=2)
     accept_button = types.InlineKeyboardButton(
         "Accept",
@@ -262,7 +294,7 @@ def user_request_desision(call: types.CallbackQuery):
     )
     markup.row(decline_button, accept_button)
     bot.edit_message_text(
-        text=responce_message,
+        text=response_message,
         chat_id=chat.chat_id,
         message_id=message.message_id,
         reply_markup=markup,
@@ -285,14 +317,42 @@ def user_request_desision_handler(call: types.CallbackQuery):
     if decision == "accept":
         user.is_member = True
         user.save()
-        responce_message = f"You accepted {user.username}!"
+        response_message = f"You accepted {user.username}!"
     else:
         user.is_member = False
         user.group = None
         user.save()
-        responce_message = f"You declined {user.username}!"
+        response_message = f"You declined {user.username}!"
     return bot.edit_message_text(
-        responce_message,
+        response_message,
         chat_id=chat.chat_id,
         message_id=message.message_id,
+    )
+
+
+@bot.callback_query_handler(
+    func=lambda call: re.fullmatch(
+        r"group=\d{6}\|cmd=user_info\|id=[0-9]{1,12}\|return_page=[0-9]{1,12}$", call.data
+    )
+)
+def user_info_handler(call: types.CallbackQuery):
+    logging.debug(f"Registered callback with callback data :{call.data}")
+    message: types.types.Message = call.message
+    chat = Chat.get_chat(message.chat.id)
+    group = chat.connected_user.group
+    preparsed_values = call.data.split("|")
+    user_id = int(preparsed_values[2].split("=")[1])
+    return_page = int(preparsed_values[3].split("=")[1])
+    user = ScheduleUser.objects.get(id=user_id)
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    button_cancel = types.InlineKeyboardButton(
+            "❌", callback_data=f"group={group.name}|cmd=info|page={return_page}"
+    )
+    markup.row(button_cancel)
+    response_message = "User info:\nusername: {username}\nfull name: {first_name} {last_name}\nPossible telegram usernames:\n@{usernames}".format(username=user.username, first_name=user.first_name, last_name=user.last_name, usernames='\n@'.join([el.telegram_username for el in Chat.objects.filter(connected_user=user)]))
+    return bot.edit_message_text(
+        response_message,
+        chat_id=chat.chat_id,
+        message_id=message.message_id,
+        reply_markup=markup
     )

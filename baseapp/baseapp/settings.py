@@ -86,7 +86,7 @@ else:
         DATA_UPLOAD = json_doc["data-fetching"]
         LOG_FILE = None
 
-LOG_LEVEL = int(os.environ.get("LOG_LEVEL", default=logging.WARNING))
+LOG_LEVEL = int(os.environ.get("LOG_LEVEL", default=logging.DEBUG))
 
 logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 

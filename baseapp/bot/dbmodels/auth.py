@@ -60,11 +60,11 @@ class ScheduleUser(AbstractBaseUser):
         req_users = ScheduleUser.objects.filter(group=group, is_member=False).order_by(
             "id"
         )
-        return req_users[5 * page : 5 * (page + 1)], len(req_users)
+        return req_users[4 * page : 4 * (page + 1)], len(req_users)
 
     def get_members(self, group, page):
         members = ScheduleUser.objects.filter(group=group)
-        return members[5 * page : 5 * (page + 1)], len(members)
+        return members[4 * page : 4 * (page + 1)], len(members)
 
 
 class GroupLead(models.Model):
