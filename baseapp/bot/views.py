@@ -85,11 +85,11 @@ def cmd_cancel_handler(message):
             chat.connected_user = None
     chat.state = State.NO_ACTIONS.value
     bot.send_message(chat_id, responce_message)
+    chat.save()
     if chat.authorised:
         authorised.keyboard(chat)
     else:
         unauthorised.keyboard(chat)
-    chat.save()
 
 
 @bot.message_handler(

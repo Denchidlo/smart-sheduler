@@ -12,29 +12,6 @@ group_handled_states = [
     State.ON_ACTION_NOTIFY,
 ]
 
-
-@bot.message_handler(
-    content_types=["text"],
-    func=lambda message: authorized(message.chat.id)
-    and onstate(message.chat.id, group_handled_states),
-)
-def group_actions_handler(message: types.Message):
-    result = None
-    chat_id = message.chat.id
-    chat = Chat.get_chat(chat_id)
-    state = chat.state
-    request = message.text
-    if state == State.ON_ACTION_SCHEDULE_GROUP_ENTER.value:
-        result = schedule_group_input(chat, request)
-    elif state == State.ON_ACTION_NOTIFY.value:
-        result = notify_group_input(chat, request)
-    elif state == State.ON_GROUP_REQUEST_NAME.value:
-        result = request_group_input(chat, request)
-    else:
-        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
-    return result
-
-
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
         r"^group=\d{6}\|cmd=info\|page=[0-9]{1,12}$", call.data
@@ -102,6 +79,19 @@ def group_action_handler(call: types.CallbackQuery):
                     message_id=message.message_id,
                 )
                 button_group(chat)
+            elif cmd == "leave":
+                if group.grouplead.user == chat.connected_user:
+                    group.grouplead.user = None
+                    group.grouplead.save()
+                chat.connected_user.group = None
+                chat.connected_user.is_member = False
+                chat.connected_user.save()
+                bot.edit_message_text(
+                        f"You left group {group.name}:",
+                        chat_id=chat.chat_id,
+                        message_id=message.message_id,
+                )
+                button_group.chat()
             elif group.grouplead.user.id == chat.connected_user.id:
                 if cmd == "notify":
                     bot.edit_message_text(
@@ -148,6 +138,11 @@ def button_group(chat):
         markup.add(group_info, group_schedule, notify_all_button, membership_requests)
     else:
         markup.add(group_info, group_schedule)
+    button_leave_group = types.InlineKeyboardButton(
+            "Leave group",
+            callback_data=f"group={group.name}|cmd=leave",
+    )
+    markup.add(button_leave_group)
     bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
 
 
@@ -305,7 +300,7 @@ def user_request_desision(call: types.CallbackQuery):
 
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
-        r"group=\d{6}\|cmd=user_(?:accept|decline)\|id=[0-9]{1,12}$", call.data
+        r"group=\d{6}\|cmd=user_(?:accept|decline|kick|makeadmin)\|id=[0-9]{1,12}$", call.data
     )
 )
 def user_request_desision_handler(call: types.CallbackQuery):
@@ -320,6 +315,15 @@ def user_request_desision_handler(call: types.CallbackQuery):
         user.is_member = True
         user.save()
         response_message = f"You accepted {user.username}!"
+    elif decision == "kick":
+        user.is_member = False
+        user.group = None
+        user.save()
+        response_message = f"You kicked {user.username}!"
+    elif decision =="makeadmin":
+        chat.connected_user.group.grouplead.user = user
+        chat.connected_user.group.grouplead.save()
+        response_message = f"You made {user.username} new group lead!"
     else:
         user.is_member = False
         user.group = None
@@ -348,9 +352,18 @@ def user_info_handler(call: types.CallbackQuery):
     return_page = int(preparsed_values[3].split("=")[1])
     user = ScheduleUser.objects.get(id=user_id)
     markup = types.InlineKeyboardMarkup(row_width=1)
+    button_kick_user = types.InlineKeyboardButton(
+        "Kick user", callback_data=f"group={group.name}|cmd=user_kick|id={user.id}"
+    )
+    button_admin_user = types.InlineKeyboardButton(
+        "Make grouplead", callback_data=f"group={group.name}|cmd=user_makeadmin|id={user.id}"
+    )
     button_cancel = types.InlineKeyboardButton(
         "❌", callback_data=f"group={group.name}|cmd=info|page={return_page}"
     )
+    if group.grouplead.user.id == chat.connected_user.id and user != chat.connected_user:
+        markup.row(button_kick_user)
+        markup.row(button_admin_user)    
     markup.row(button_cancel)
     response_message = "User info:\nusername: {username}\nfull name: {first_name} {last_name}\nPossible telegram usernames:\n@{usernames}".format(
         username=user.username,
@@ -366,3 +379,23 @@ def user_info_handler(call: types.CallbackQuery):
         message_id=message.message_id,
         reply_markup=markup,
     )
+
+
+group_handler_map = {
+    State.ON_ACTION_SCHEDULE_GROUP_ENTER.value: schedule_group_input,
+    State.ON_ACTION_NOTIFY.value: notify_group_input,
+    State.ON_GROUP_REQUEST_NAME.value : request_group_input
+}
+
+
+@bot.message_handler(
+    content_types=["text"],
+    func=lambda message: authorized(message.chat.id)
+    and onstate(message.chat.id, group_handled_states),
+)
+def group_actions_handler(message: types.Message):
+    chat_id = message.chat.id
+    chat = Chat.get_chat(chat_id)
+    state = chat.state
+    request = message.text
+    return group_handler_map[state](chat, request)

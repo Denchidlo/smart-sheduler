@@ -15,68 +15,21 @@ authorised_handled_states = [
     State.ON_ACCOUNT,
 ]
 
+def on_actions_default(chat, message):
+    button_actions(chat)
+    return bot.reply_to(message, "Oops, i don't know what to do with it!")
 
-@bot.message_handler(
-    content_types=["text"],
-    func=lambda message: authorized(message.chat.id)
-    and onstate(message.chat.id, authorised_handled_states),
-)
-def authorised_actions_handler(message: types.Message):
-    result = None
-    chat_id = message.chat.id
-    chat = Chat.get_chat(chat_id)
-    state = chat.state
-    request = message.text
-    if state == State.NO_ACTIONS.value:
-        if request == "Actions 📋":
-            result = button_actions(chat)
-        elif request == "Account 📝":
-            result == button_account(chat)
-        elif request == "Logout 🚶‍♂️":
-            result = button_logout(chat)
-        else:
-            result = keyboard(chat)
-    elif state == State.ON_ACTIONS.value:
-        if request == "Get schedule":
-            result = button_get_schedule(chat)
-        elif request == "Group":
-            result = button_group(chat)
-        elif request == "Request group membership":
-            button_request_membership(chat)
-        elif request == "Back to keyboard":
-            result = button_back_to_keyboard(chat)
-        else:
-            button_actions(chat)
-            result = bot.reply_to(message, "Oops, i don't know what to do with it!")
-    elif state == State.ON_ACCOUNT.value:
-        if request == "Edit username":
-            result = edit_username_button(chat)
-        elif request == "Edit first and last name":
-            result = edit_full_name_button(chat)
-        elif request == "Edit password":
-            result = edit_password_button(chat)
-        elif request == "Delete user":
-            result = delete_user_button(chat)
-        elif request == "Back to keyboard":
-            result = button_back_to_keyboard(chat)
-        else:
-            button_actions(chat)
-    else:
-        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
-    return result
+def on_account_default(chat, message):
+    button_account(chat)
+    return bot.reply_to(message, "Oops, i don't know what to do with it!")
 
-
-def keyboard(chat):
+def keyboard(chat, message=None):
     user = chat.connected_user
-    if user != None:
-        return bot.send_message(
-            chat.chat_id,
-            text="What do you want, {username}".format(username=user.first_name),
-            reply_markup=AUTHORISED_KB_MARKUP,
-        )
-    else:
-        raise ValueError("Unauthorised access of authorised.keyboard")
-
+    return bot.send_message(
+        chat.chat_id,
+        text="What do you want, {username}".format(username=user.first_name),
+        reply_markup=AUTHORISED_KB_MARKUP,
+    )
 
 def button_logout(chat):
     chat_id = chat.chat_id
@@ -121,3 +74,47 @@ def button_back_to_keyboard(chat):
     chat.state = State.NO_ACTIONS.value
     chat.save()
     return keyboard(chat)
+
+
+authorised_action_handler_map = {
+    State.NO_ACTIONS.value: {
+        "Actions 📋": button_actions,
+        "Account 📝": button_account,
+        "Logout 🚶‍♂️": button_logout,
+        "default": keyboard
+    },
+    State.ON_ACTIONS.value: {
+        "Get schedule": button_get_schedule,
+        "Group": button_group,
+        "Request group membership": button_request_membership,
+        "Back to keyboard": button_back_to_keyboard,
+        "default": on_actions_default
+    },
+    State.ON_ACCOUNT.value: {
+        "Edit username": edit_username_button,
+        "Edit first and last name": edit_full_name_button,
+        "Edit password": edit_password_button,
+        "Delete user": delete_user_button,
+        "Back to keyboard": button_back_to_keyboard,
+        "default": on_account_default
+    }
+}
+
+@bot.message_handler(
+    content_types=["text"],
+    func=lambda message: authorized(message.chat.id)
+    and onstate(message.chat.id, authorised_handled_states),
+)
+def authorised_actions_handler(message: types.Message):
+    chat_id = message.chat.id
+    chat = Chat.get_chat(chat_id)
+    state = chat.state
+    request = message.text
+    state_handler = authorised_action_handler_map[state]
+    if request in state_handler.keys():
+        if request != "default":
+            return state_handler[request](chat)
+        else:
+            return state_handler[request](chat, message)
+    return state_handler['default'](chat, message)
+

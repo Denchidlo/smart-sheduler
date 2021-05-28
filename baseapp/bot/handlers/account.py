@@ -11,39 +11,14 @@ account_handled_states = [
 ]
 
 
-@bot.message_handler(
-    content_types=["text"],
-    func=lambda message: authorized(message.chat.id)
-    and onstate(message.chat.id, account_handled_states),
-)
-def group_actions_handler(message: types.Message):
-    result = None
-    chat_id = message.chat.id
-    chat = Chat.get_chat(chat_id)
-    state = chat.state
-    request = message.text
-    if state == State.ON_ACCOUNT_USERNAME_INPUT.value:
-        result = username_change_input(chat, request)
-    elif state == State.ON_ACCOUNT_FULLNAME_INPUT.value:
-        result = fullname_change_input(chat, request)
-    elif state == State.ON_ACCOUNT_PASSCHG_CONFIRM.value:
-        result = password_change_confirm(chat, request)
-    elif state == State.ON_ACCOUNT_PASSCHG_INPUT.value:
-        result = password_change_input(chat, request)
-    elif state == State.ON_ACCOUNT_DELETE.value:
-        result = delete_user_input(chat, request)
-    else:
-        result = bot.reply_to(message, "Oops, i don't know what to do with it!")
-    return result
-
-
 def username_change_input(chat, message_input):
     chat_id = chat.chat_id
     try:
         ScheduleUser.objects.get(username=message_input)
-        unique = True
-    except:
         unique = False
+    except:
+        unique = True
+    print(f"Unique---------------{unique}------------")
     if validate_username(message_input) and unique:
         chat.connected_user.username = message_input
         chat.connected_user.save()
@@ -114,7 +89,7 @@ def delete_user_input(chat, message_input):
         chat.authorised = False
         chat.state = State.NO_ACTIONS.value
         chat.save()
-        if user.group.grouplead.user.id == user.id:
+        if user.group != None and user.group.grouplead.user.id == user.id:
             user.group.grouplead.user = None
             user.group.grouplead.save()
             user.group.save()
@@ -171,3 +146,24 @@ def delete_user_button(chat):
     return bot.send_message(
         chat_id, "Are you sure?", reply_markup=ACCOUNT_DELETE_MARKUP
     )
+
+
+account_handler_map = {
+    State.ON_ACCOUNT_USERNAME_INPUT.value: username_change_input,
+    State.ON_ACCOUNT_FULLNAME_INPUT.value: fullname_change_input,
+    State.ON_ACCOUNT_PASSCHG_CONFIRM.value: password_change_confirm,
+    State.ON_ACCOUNT_PASSCHG_INPUT.value: password_change_input,
+    State.ON_ACCOUNT_DELETE.value: delete_user_input
+}
+
+@bot.message_handler(
+    content_types=["text"],
+    func=lambda message: authorized(message.chat.id)
+    and onstate(message.chat.id, account_handled_states),
+)
+def group_actions_handler(message: types.Message):
+    chat_id = message.chat.id
+    chat = Chat.get_chat(chat_id)
+    state = chat.state
+    request = message.text
+    return account_handler_map[state](chat, request)
