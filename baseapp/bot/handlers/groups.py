@@ -12,6 +12,7 @@ group_handled_states = [
     State.ON_ACTION_NOTIFY,
 ]
 
+
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
         r"^group=\d{6}\|cmd=info\|page=[0-9]{1,12}$", call.data
@@ -73,12 +74,12 @@ def group_action_handler(call: types.CallbackQuery):
             cmd = preparsed_values[1].split("=")[1]
             group = chat.connected_user.group
             if cmd == "stop":
+                button_group(chat)
                 bot.edit_message_text(
                     "Closed",
                     chat_id=chat.chat_id,
                     message_id=message.message_id,
                 )
-                button_group(chat)
             elif cmd == "leave":
                 if group.grouplead.user == chat.connected_user:
                     group.grouplead.user = None
@@ -86,21 +87,21 @@ def group_action_handler(call: types.CallbackQuery):
                 chat.connected_user.group = None
                 chat.connected_user.is_member = False
                 chat.connected_user.save()
+                chat.save()
                 bot.edit_message_text(
-                        f"You left group {group.name}:",
-                        chat_id=chat.chat_id,
-                        message_id=message.message_id,
+                    f"You left group {group.name}:",
+                    chat_id=chat.chat_id,
+                    message_id=message.message_id,
                 )
-                button_group.chat()
             elif group.grouplead.user.id == chat.connected_user.id:
                 if cmd == "notify":
+                    chat.state = State.ON_ACTION_NOTIFY.value
+                    chat.save()
                     bot.edit_message_text(
                         f"Print your message:",
                         chat_id=chat.chat_id,
                         message_id=message.message_id,
                     )
-                    chat.state = State.ON_ACTION_NOTIFY.value
-                    chat.save()
         else:
             bot.edit_message_text(
                 f"Oops, you came to far...\n\nMaybe you use irrelevant link",
@@ -138,9 +139,10 @@ def button_group(chat):
         markup.add(group_info, group_schedule, notify_all_button, membership_requests)
     else:
         markup.add(group_info, group_schedule)
+    chat.save()
     button_leave_group = types.InlineKeyboardButton(
-            "Leave group",
-            callback_data=f"group={group.name}|cmd=leave",
+        "Leave group",
+        callback_data=f"group={group.name}|cmd=leave",
     )
     markup.add(button_leave_group)
     bot.send_message(chat_id, "Choose the action:", reply_markup=markup)
@@ -199,7 +201,7 @@ def notify_group_input(chat, message_input):
                     chat_id,
                     f"Notification from {chat.connected_user.username}\n\n{message_input}",
                 )
-            except ApiTelegramException as ex:
+            except ApiTelegramException as ex:  # pragma: no cover
                 chat = Chat.get_chat(chat_id)
                 chat.connected_user = None
                 chat.state = State.CHAT_STARTED.value
@@ -300,7 +302,8 @@ def user_request_desision(call: types.CallbackQuery):
 
 @bot.callback_query_handler(
     func=lambda call: re.fullmatch(
-        r"group=\d{6}\|cmd=user_(?:accept|decline|kick|makeadmin)\|id=[0-9]{1,12}$", call.data
+        r"group=\d{6}\|cmd=user_(?:accept|decline|kick|makeadmin)\|id=[0-9]{1,12}$",
+        call.data,
     )
 )
 def user_request_desision_handler(call: types.CallbackQuery):
@@ -320,7 +323,7 @@ def user_request_desision_handler(call: types.CallbackQuery):
         user.group = None
         user.save()
         response_message = f"You kicked {user.username}!"
-    elif decision =="makeadmin":
+    elif decision == "makeadmin":
         chat.connected_user.group.grouplead.user = user
         chat.connected_user.group.grouplead.save()
         response_message = f"You made {user.username} new group lead!"
@@ -356,14 +359,18 @@ def user_info_handler(call: types.CallbackQuery):
         "Kick user", callback_data=f"group={group.name}|cmd=user_kick|id={user.id}"
     )
     button_admin_user = types.InlineKeyboardButton(
-        "Make grouplead", callback_data=f"group={group.name}|cmd=user_makeadmin|id={user.id}"
+        "Make grouplead",
+        callback_data=f"group={group.name}|cmd=user_makeadmin|id={user.id}",
     )
     button_cancel = types.InlineKeyboardButton(
         "❌", callback_data=f"group={group.name}|cmd=info|page={return_page}"
     )
-    if group.grouplead.user.id == chat.connected_user.id and user != chat.connected_user:
+    if (
+        group.grouplead.user.id == chat.connected_user.id
+        and user != chat.connected_user
+    ):
         markup.row(button_kick_user)
-        markup.row(button_admin_user)    
+        markup.row(button_admin_user)
     markup.row(button_cancel)
     response_message = "User info:\nusername: {username}\nfull name: {first_name} {last_name}\nPossible telegram usernames:\n@{usernames}".format(
         username=user.username,
@@ -384,7 +391,7 @@ def user_info_handler(call: types.CallbackQuery):
 group_handler_map = {
     State.ON_ACTION_SCHEDULE_GROUP_ENTER.value: schedule_group_input,
     State.ON_ACTION_NOTIFY.value: notify_group_input,
-    State.ON_GROUP_REQUEST_NAME.value : request_group_input
+    State.ON_GROUP_REQUEST_NAME.value: request_group_input,
 }
 
 

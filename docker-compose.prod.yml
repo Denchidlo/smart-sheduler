@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  db:
+    build: ./db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.prod.db.env
+  web:
+    build:
+      context: ./baseapp
+      dockerfile: Dockerfile.prod
+    volumes:
+      - static_volume:/home/app/baseapp/staticfiles
+    command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    env_file:
+      - ./.prod.env
+    depends_on:
+      - db
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+volumes:
+  postgres_data:
+  static_volume:

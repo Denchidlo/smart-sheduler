@@ -18,3 +18,8 @@ config.ini
 
 # Virtual enviroment
 telebot-env
+dev-env
+
+# Evivroment configs
+.dev.env
+.prod.env

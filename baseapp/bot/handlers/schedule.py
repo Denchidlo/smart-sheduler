@@ -6,8 +6,8 @@ from telebot import types
 def button_get_schedule(chat):
     chat_id = chat.chat_id
     chat.state = State.ON_ACTION_SCHEDULE_GROUP_ENTER.value
-    bot.send_message(chat_id, "Set group number:", reply_markup=CANCEL_MARKUP)
     chat.save()
+    bot.send_message(chat_id, "Set group number:", reply_markup=CANCEL_MARKUP)
 
 
 def schedule_group_input(chat, message_input):

@@ -50,6 +50,7 @@ def login_username_input(message):
 )
 def login_password_input(message):
     message_input = message.text
+    print(message.text)
     chat_id = message.chat.id
     chat = Chat.objects.get(chat_id=chat_id)
     if (
@@ -57,14 +58,15 @@ def login_password_input(message):
         and chat.connected_user.check_password(message_input) == True
     ):
         chat.authorised = True
-        bot.send_message(chat_id, "Success!")
         chat.state = State.NO_ACTIONS.value
+        chat.save()
         keyboard(chat)
+        bot.send_message(chat_id, "Success!")
     else:
         chat.connected_user = None
+        chat.state = State.LOGING_IN_UNAME.value
+        chat.save()
         bot.send_message(
             chat_id, "Login failed!\nIvalid username or password\nTry again:"
         )
         bot.send_message(chat_id, "Enter username:", reply_markup=CANCEL_MARKUP)
-        chat.state = State.LOGING_IN_UNAME.value
-    chat.save()

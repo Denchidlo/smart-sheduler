@@ -18,7 +18,6 @@ def username_change_input(chat, message_input):
         unique = False
     except:
         unique = True
-    print(f"Unique---------------{unique}------------")
     if validate_username(message_input) and unique:
         chat.connected_user.username = message_input
         chat.connected_user.save()
@@ -153,8 +152,9 @@ account_handler_map = {
     State.ON_ACCOUNT_FULLNAME_INPUT.value: fullname_change_input,
     State.ON_ACCOUNT_PASSCHG_CONFIRM.value: password_change_confirm,
     State.ON_ACCOUNT_PASSCHG_INPUT.value: password_change_input,
-    State.ON_ACCOUNT_DELETE.value: delete_user_input
+    State.ON_ACCOUNT_DELETE.value: delete_user_input,
 }
+
 
 @bot.message_handler(
     content_types=["text"],

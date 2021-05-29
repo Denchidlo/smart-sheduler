@@ -13,12 +13,9 @@ handled_states = [
 ]
 
 
-
 def default_unauthorised_handler(chat, message):
     bot.reply_to(message, "Oops, i don't know what to do with it!")
     return button_actions(chat)
-
-
 
 
 def button_login(chat):
@@ -67,19 +64,21 @@ def button_back_to_keyboard(chat):
     chat.save()
     keyboard(chat)
 
+
 unauthorised_action_handler_map = {
     State.NO_ACTIONS.value: {
         "Actions 📋": button_actions,
         "Login": button_login,
         "Sign in": button_signin,
-        "default": keyboard
+        "default": keyboard,
     },
     State.ON_ACTIONS.value: {
         "Get schedule": button_get_schedule,
         "Back to keyboard": button_back_to_keyboard,
-        "default": default_unauthorised_handler
-    }
+        "default": default_unauthorised_handler,
+    },
 }
+
 
 @bot.message_handler(
     content_types=["text"],
@@ -100,4 +99,4 @@ def unauthorised_actions_handler(message: types.Message):
                 return state_handler[request](chat)
             else:
                 return state_handler[request](chat, message)
-        return state_handler['default'](chat, message)
+        return state_handler["default"](chat, message)

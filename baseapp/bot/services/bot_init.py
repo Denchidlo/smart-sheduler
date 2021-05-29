@@ -7,7 +7,6 @@ import logging
 __author__ = "@schedulebase_bot"
 
 if settings.DEBUG:  # pragma: no cover
-    logger.setLevel(settings.LOG_LEVEL)
 
     # if not settings.DATA_UPLOAD:
     logging.debug(f"Created base user admin")
@@ -16,16 +15,11 @@ if settings.DEBUG:  # pragma: no cover
     except:
         ScheduleUser.objects.create_superuser("admin", "Чепуха", "Костлявая", "admin")
 
+logger.setLevel(settings.LOG_LEVEL)
 
 bot = AsyncTeleBot(settings.TOKEN)
 bot.threaded = True
 
-bot.set_my_commands(
-    [
-        types.BotCommand("start", "Begin authentification"),
-        types.BotCommand("cancel", "Interrupt all actions, get to the stable state"),
-    ]
-)
 settings.BOT = bot
 
 bot.remove_webhook()

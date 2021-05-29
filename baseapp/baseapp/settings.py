@@ -22,7 +22,6 @@ from django.conf import settings
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -36,8 +35,9 @@ AUTH_USER_MODEL = "bot.ScheduleUser"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DOCKERIZED = bool(os.environ.get("DOCKERISED", default=False))
+PRODUCTION_MODE = False
 
+DOCKERIZED = bool(os.environ.get("DOCKERISED", default=False))
 
 if DOCKERIZED:
     DEBUG = bool(os.environ.get("DEBUG", default=True))
@@ -53,20 +53,18 @@ if DOCKERIZED:
         if responce.status_code == 200:
             ngrok_responce = responce.json()
             tunnel = ngrok_responce["tunnels"][0]
-            print(
-                '\n\tServer public domain: "{domain}"\n'.format(
-                    domain=tunnel["public_url"][8:]
-                )
-            )
             if tunnel["proto"] == "http":
                 DOMAIN = tunnel["public_url"][7:]
             elif tunnel["proto"] == "https":
                 DOMAIN = tunnel["public_url"][8:]
+
+            logging.info(f"\n\n\tDomain: {DOMAIN}\n\n")
+
         else:
             logging.exception(
                 "GET request failed with status code {code}\nRequest:{req_str}".format(
                     code=responce.status_code,
-                    req_str="http://localhost:4041/api/tunnels",
+                    req_str="http://localhost:4040/api/tunnels",
                 )
             )
             raise ConnectionError("Cannot connect to api")
@@ -87,11 +85,15 @@ else:
         LOG_FILE = None
 
 LOG_LEVEL = int(os.environ.get("LOG_LEVEL", default=logging.DEBUG))
-
 logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 
-ALLOWED_HOSTS = [settings.DOMAIN, "0.0.0.0"]
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS", default="localhost 127.0.0.1 [::1]"
+).split(" ")
+if not PRODUCTION_MODE:
+    ALLOWED_HOSTS.append(DOMAIN)
 # Application definition
+
 
 INSTALLED_APPS = [
     "bot.apps.BotConfig",
@@ -186,7 +188,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "/staticfiles/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

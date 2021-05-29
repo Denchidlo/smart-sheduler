@@ -56,18 +56,17 @@ class ScheduleUser(AbstractBaseUser):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["USERNAME_FIELD", "first_name", "last_name"]
 
-
-    def __str__(self): # pragma: no cover
+    def __str__(self):  # pragma: no cover
         return self.username
 
-    def has_perm(self, perm, obj=None): # pragma: no cover
+    def has_perm(self, perm, obj=None):  # pragma: no cover
         return True
 
-    def has_module_perms(self, app_label): # pragma: no cover
+    def has_module_perms(self, app_label):  # pragma: no cover
         return True
 
     @property
-    def is_staff(self): # pragma: no cover
+    def is_staff(self):  # pragma: no cover
         return self.is_admin
 
     def get_requests(self, group, page):

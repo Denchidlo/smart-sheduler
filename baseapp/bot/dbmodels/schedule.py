@@ -73,7 +73,7 @@ class Week(Enum):
 class Lesson(models.Model):
     weekday = models.SmallIntegerField()
     weeks = models.IntegerField()
-    subgroup = models.SmallIntegerField(default=0)
+    subgroup = models.SmallIntegerField(default=0, null=True)
     auditory = models.CharField(max_length=30, null=True, blank=True, default="unknown")
     lesson_time = models.CharField(max_length=11)
     lesson_start = models.TimeField()
@@ -84,4 +84,4 @@ class Lesson(models.Model):
     employee = models.ForeignKey(
         Employee, on_delete=models.CASCADE, default=None, null=True, blank=True
     )
-    zaoch = models.BooleanField(default=False)
+    zaoch = models.BooleanField(default=False, null=True)

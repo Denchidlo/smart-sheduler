@@ -15,13 +15,16 @@ authorised_handled_states = [
     State.ON_ACCOUNT,
 ]
 
+
 def on_actions_default(chat, message):
     button_actions(chat)
     return bot.reply_to(message, "Oops, i don't know what to do with it!")
 
+
 def on_account_default(chat, message):
     button_account(chat)
     return bot.reply_to(message, "Oops, i don't know what to do with it!")
+
 
 def keyboard(chat, message=None):
     user = chat.connected_user
@@ -30,6 +33,7 @@ def keyboard(chat, message=None):
         text="What do you want, {username}".format(username=user.first_name),
         reply_markup=AUTHORISED_KB_MARKUP,
     )
+
 
 def button_logout(chat):
     chat_id = chat.chat_id
@@ -81,14 +85,14 @@ authorised_action_handler_map = {
         "Actions 📋": button_actions,
         "Account 📝": button_account,
         "Logout 🚶‍♂️": button_logout,
-        "default": keyboard
+        "default": keyboard,
     },
     State.ON_ACTIONS.value: {
         "Get schedule": button_get_schedule,
         "Group": button_group,
         "Request group membership": button_request_membership,
         "Back to keyboard": button_back_to_keyboard,
-        "default": on_actions_default
+        "default": on_actions_default,
     },
     State.ON_ACCOUNT.value: {
         "Edit username": edit_username_button,
@@ -96,9 +100,10 @@ authorised_action_handler_map = {
         "Edit password": edit_password_button,
         "Delete user": delete_user_button,
         "Back to keyboard": button_back_to_keyboard,
-        "default": on_account_default
-    }
+        "default": on_account_default,
+    },
 }
+
 
 @bot.message_handler(
     content_types=["text"],
@@ -116,5 +121,4 @@ def authorised_actions_handler(message: types.Message):
             return state_handler[request](chat)
         else:
             return state_handler[request](chat, message)
-    return state_handler['default'](chat, message)
-
+    return state_handler["default"](chat, message)

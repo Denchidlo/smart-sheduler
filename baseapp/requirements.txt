@@ -1,10 +1,9 @@
+gunicorn==20.0.4
 appdirs==1.4.4
 APScheduler==3.6.3
 asgiref==3.3.4
 async-lru==1.0.2
 attrs==21.2.0
-autopep8==1.5.7
-black==21.5b1
 certifi==2020.12.5
 chardet==4.0.0
 click==8.0.1
@@ -24,7 +23,6 @@ py==1.10.0
 pyaes==1.6.1
 pycodestyle==2.7.0
 pyparsing==2.4.7
-Pyrogram==1.2.9
 PySocks==1.7.1
 pyTelegramBotAPI==3.7.7
 pytest==6.2.4
