@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   db:
-    build: ./db
+    image: den1ss1mo/smart-scheduler_db:latest
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -11,7 +11,7 @@ services:
       - common
 
   web:
-    build: ./baseapp
+    image: den1ss1mo/smart-scheduler_web:latest
     command: gunicorn baseapp.wsgi:application --bind 0.0.0.0:8000
     restart: always
     volumes:
@@ -35,7 +35,7 @@ services:
       - common
 
   nginx:
-    build: ./nginx
+    image: den1ss1mo/smart-scheduler_nginx:latest
     restart: always
     networks:
         - common
