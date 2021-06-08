@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DOMAIN", default="asdasfas23i27rqwgerxsYA^S&DR^%ADC")
+SECRET_KEY = os.environ.get("SECRET_KEY", default="asdasfas23i27rqwgerxsYA^S&DR^%ADC")
 
 AUTH_USER_MODEL = "bot.ScheduleUser"
 
@@ -44,30 +44,29 @@ if DOCKERIZED:
     PRODUCTION_MODE = bool(os.environ.get("PROD_MODE", default=False))
 
     if PRODUCTION_MODE:
-        DOMAIN = os.environ.get("DOMAIN", default=None)
         LOG_FILE = "bottrace.log"
     else:
         LOG_FILE = None
-        time.sleep(5)
-        responce = req.get("http://localhost:4040/api/tunnels")
-        if responce.status_code == 200:
-            ngrok_responce = responce.json()
-            tunnel = ngrok_responce["tunnels"][0]
-            if tunnel["proto"] == "http":
-                DOMAIN = tunnel["public_url"][7:]
-            elif tunnel["proto"] == "https":
-                DOMAIN = tunnel["public_url"][8:]
+    time.sleep(5)
+    responce = req.get("http://ngrok:4040/api/tunnels")
+    if responce.status_code == 200:
+        ngrok_responce = responce.json()
+        tunnel = ngrok_responce["tunnels"][0]
+        if tunnel["proto"] == "http":
+            DOMAIN = tunnel["public_url"][7:]
+        elif tunnel["proto"] == "https":
+            DOMAIN = tunnel["public_url"][8:]
 
-            logging.info(f"\n\n\tDomain: {DOMAIN}\n\n")
+        logging.info(f"\n\n\tDomain: {DOMAIN}\n\n")
 
-        else:
-            logging.exception(
-                "GET request failed with status code {code}\nRequest:{req_str}".format(
-                    code=responce.status_code,
-                    req_str="http://localhost:4040/api/tunnels",
-                )
+    else:
+        logging.exception(
+            "GET request failed with status code {code}\nRequest:{req_str}".format(
+                code=responce.status_code,
+                req_str="http://localhost:4040/api/tunnels",
             )
-            raise ConnectionError("Cannot connect to api")
+        )
+        raise ConnectionError("Cannot connect to api")
 
     DATA_UPLOAD = bool(int(os.environ.get("DATA_UPLOAD", default=False)))
     TOKEN = os.environ.get("API_TOKEN", default=None)
@@ -90,8 +89,7 @@ logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 ALLOWED_HOSTS = os.environ.get(
     "DJANGO_ALLOWED_HOSTS", default="localhost 127.0.0.1 [::1]"
 ).split(" ")
-if not PRODUCTION_MODE:
-    ALLOWED_HOSTS.append(DOMAIN)
+ALLOWED_HOSTS.append(DOMAIN)
 # Application definition
 
 

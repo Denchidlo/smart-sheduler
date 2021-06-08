@@ -2,29 +2,51 @@ version: '3.7'
 services:
   db:
     build: ./db
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ./.prod.db.env
+    env_file: 
+      - .prod.db.env
+    networks: 
+      - common
+
   web:
-    build:
-      context: ./baseapp
-      dockerfile: Dockerfile.prod
+    build: ./baseapp
+    command: gunicorn baseapp.wsgi:application --bind 0.0.0.0:8000
+    restart: always
     volumes:
-      - static_volume:/home/app/baseapp/staticfiles
-    command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
-    expose:
-      - 8000
+      - ./baseapp/:/usr/src/baseapp/
+    ports:
+      - 8000:8000
     env_file:
-      - ./.prod.env
+      - ./.dev.env
     depends_on:
       - db
+    networks: 
+      - common
+
+  ngrok:
+    image: wernight/ngrok
+    env_file: 
+        - ./ngrok/.env
+    ports:
+      - 4040:4040
+    networks: 
+      - common
+
   nginx:
     build: ./nginx
+    restart: always
+    networks:
+        - common
     ports:
       - 1337:80
     depends_on:
       - web
+
 volumes:
   postgres_data:
-  static_volume:
+
+networks: 
+  common:
+    name: common
