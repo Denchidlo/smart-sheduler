@@ -16,8 +16,8 @@ services:
     restart: always
     volumes:
       - ./baseapp/:/usr/src/baseapp/
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     env_file:
       - ./.dev.env
     depends_on:
@@ -29,8 +29,8 @@ services:
     image: wernight/ngrok
     env_file: 
         - ./ngrok/.env
-    ports:
-      - 4040:4040
+    expose:
+      - 4040
     networks: 
       - common
 
