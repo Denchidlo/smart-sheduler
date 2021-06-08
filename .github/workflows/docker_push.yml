@@ -16,6 +16,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/checkout@v2
       - name: Build the stack
-        run: docker-compose up -d --build
+        run: docker-compose -f "docker-compose.prod.yml"  up -d --build 
       - name: Test
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/smart-schedule:latest
