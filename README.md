@@ -1,21 +1,21 @@
 # smart-scheduler
  
+## Проект, представляющий собой небольшую платформу для студентов БГУИР в мессенджере телеграм.
 
+Пользователю доступен просмотр расписания, учебные группы в которых можно взаимодействовать с другими пользователями.
+Бот: @schedulebase_bot
 
-* smart-scheduler
-    * requirements >> Faster dependency installation during co-op. Just add new .sh script to make ur teammate possible to install some package (don't forget about chmod)
-    * sandbox >> Ignored by git, but is neccesairy for making temporary changes, testing new ideas without affecting core project 
-    * schedule-fetcher >> Little util, created for fetching all data from ***BSUIR API*** to local databases 
-    * server >> our project itself
+## Установка и запуск
 
-# Technologies:
+1) Dev режим -- здесь происходит проверка работоспособности проекта при разработке, потому попрошу запускать "[docker-compose.prod.yml](docker-compose.prod.yml)", а его prod версию
+2) Prod режим -- образы были залиты на [dockerhub](https://hub.docker.com/u/den1ss1mo)
 
-* Pybot
-    * python ORM -> django.db
-    * pybot backend -> django
+### Ликбез:
 
-* Smart-scheduler
-    * DB ORM -> Hibernate + JPA (Spring Data)
-    * DB -> MySQL
-    * Backend -> Spring
-    * Frontend -> Mustashe | Thymeleaf
+* На л.р. демонстрировалась работа всего функционала, однако на хабе лежит пустая база (при желании sql файлик лежит внутри smart-schedule_db контейнера, не уверен, что в нём сохранились все отношения, т.к. изначально разработка и заполнение базы велось на mysql)
+* Иногда при запуске контейнера может произойти следущее: ngrok контейнер упадет, т.к у хоста уже есть соединения, они не всегда успевают закрыться (в этом случае подождите 10--15 секунд и перезапуститесь или поменяйте в ngrok/.conf токен на свой и сбилдите образ)у меня за всё время это случилось 1 раз, но всё же я решил вас предупредить
+* Токен готов и расположен в .env файликах, но вы можете попробовать перекинуть его на свой токен (в таком случае, предварительно скачав образы через prod, можете сбилдить его через [docker-compose.dev.yml](docker-compose.dev.yml). Кеш поможет сделать это шустро
+
+P.S:
+
+Я делаю ридмишку в пол 3 ночи, потому слёзно, на коленях, прошу вас в случае каких-то проблем написать мне в дискорд (я тестировал компоуз только на локальной машине, т.к. нормальные люди уже спят, попросить их запуститься я не могу). Я постараюсь не спать и дать ответ в случае чего в течение 10 минут.
